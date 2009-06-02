@@ -1,0 +1,25 @@
+Splash
+===
+  ProfileChooser
+  ProfileList
+    Edit
+    Delete
+    New profile
+
+
+
+ProfileCreator
+====
+  Name
+  Audio Levels
+  Ringtone
+  List of Contact Ringtones
+
+
+ProfileChooser
+===
+  Spinner of Profiles
+
+
+ContactPicker
+AppWidget
