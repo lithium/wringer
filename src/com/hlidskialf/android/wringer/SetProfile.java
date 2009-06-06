@@ -1,12 +1,12 @@
 package com.hlidskialf.android.wringer;
 
 import android.preference.PreferenceActivity;
+import android.preference.Preference;
 import android.content.Intent;
 import android.os.Bundle;
 
 public class SetProfile extends PreferenceActivity implements ProfileModel.ProfileReporter
 {
-
   private int mId;
   private String mName;
   private int mVolAlarm, mVolMusic, mVolNotify, mVolRinger, mVolSystem, mVolVoice;
@@ -16,16 +16,22 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
   private boolean mAirplaneOn, mWifiOn, mGpsOn, mLocationOn, mBluetoothOn, mAutoSyncOn;
   private int mBrightness, mTimeout;
 
+  private Preference mPrefContacts; 
+
 
   @Override
   protected void onCreate(Bundle icicle)
   {
     super.onCreate(icicle);
+
+
     addPreferencesFromResource(R.xml.profile_prefs);
+    mPrefContacts = findPreference("contacts");
+
+    mPrefContacts.setIntent(new Intent(this, SetProfile.class));
 
     Intent i = getIntent();
     mId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
-
     ProfileModel.getProfile(getContentResolver(), this, mId);
   }
 

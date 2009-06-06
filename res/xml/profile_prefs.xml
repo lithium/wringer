@@ -5,15 +5,17 @@
       android:title="@string/name"
       android:maxLength="25"
       />
-    <com.hlidskialf.android.wringer.TonePreference android:key="ringtone"
-      android:title="@string/ringtone"
-      android:showDefault="true"
-      android:showSilent="true"
+    <com.hlidskialf.android.preference.SeekBarPreference android:key="brightness"
+      android:title="@string/brightness"
+      android:max="255"
       />
-    <com.hlidskialf.android.wringer.TonePreference android:key="notifytone"
-      android:title="@string/notifytone"
-      android:showDefault="true"
-      android:showSilent="true"
+    <com.hlidskialf.android.preference.SeekBarPreference android:key="screen_timeout"
+      android:title="@string/screen_timeout"
+      android:max="600"
+      />
+    <CheckBoxPreference android:key="autosync_on"
+      android:title="@string/autosync_on"
+      android:summary="@string/autosync_on_summary"
       />
   </PreferenceCategory>
 
@@ -21,27 +23,27 @@
     <PreferenceScreen android:title="@string/profile_prefs_cat_volume"
                       android:summary="@string/profile_prefs_cat_volume_summary">
       <PreferenceCategory android:title="@string/profile_prefs_cat_volume"/>
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="alarm_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="alarm_vol"
         android:title="@string/alarm_vol"
         android:max="10"
         />
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="music_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="music_vol"
         android:title="@string/music_vol"
         android:max="10"
         />
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="notify_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="notify_vol"
         android:title="@string/notify_vol"
         android:max="10"
         />
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="ringer_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="ringer_vol"
         android:title="@string/ringer_vol"
         android:max="10"
         />
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="system_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="system_vol"
         android:title="@string/system_vol"
         android:max="10"
         />
-      <com.hlidskialf.android.widget.SeekBarPreference android:key="voice_vol"
+      <com.hlidskialf.android.preference.SeekBarPreference android:key="voice_vol"
         android:title="@string/voice_vol"
         android:max="10"
         />
@@ -60,17 +62,6 @@
     <CheckBoxPreference android:key="play_soundfx"
       android:title="@string/play_soundfx"
       android:summary="@string/play_soundfx_summary"
-      />
-  </PreferenceCategory>
-
-  <PreferenceCategory android:title="@string/profile_prefs_cat_screen">
-    <com.hlidskialf.android.widget.SeekBarPreference android:key="brightness"
-      android:title="@string/brightness"
-      android:max="255"
-      />
-    <com.hlidskialf.android.widget.SeekBarPreference android:key="screen_timeout"
-      android:title="@string/screen_timeout"
-      android:max="600"
       />
   </PreferenceCategory>
 
@@ -99,9 +90,22 @@
         android:summary="@string/bluetooth_on_summary"
         />
     </PreferenceScreen>
-    <CheckBoxPreference android:key="autosync_on"
-      android:title="@string/autosync_on"
-      android:summary="@string/autosync_on_summary"
-      />
   </PreferenceCategory>
+
+  <PreferenceCategory android:title="@string/profile_prefs_cat_tone">
+    <RingtonePreference android:key="ringtone"
+      android:title="@string/ringtone"
+      android:showDefault="true"
+      android:showSilent="true"
+      />
+    <RingtonePreference android:key="notifytone"
+      android:title="@string/notifytone"
+      android:showDefault="true"
+      android:showSilent="true"
+      />
+    <PreferenceScreen android:key="contacts"
+      android:title="@string/profile_prefs_cat_contacts"
+      android:summary="@string/profile_prefs_cat_contacts_summary"/>
+  </PreferenceCategory>
+
 </PreferenceScreen>

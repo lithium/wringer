@@ -12,7 +12,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SetProfile"/>
+        <activity android:name=".SetProfile" />
 
         <provider android:name="com.hlidskialf.android.wringer.ProfileProvider"
           android:authorities="com.hlidskialf.android.wringer"/>
