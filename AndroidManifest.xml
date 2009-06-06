@@ -11,5 +11,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".SetProfile"/>
+
+        <provider android:name="com.hlidskialf.android.wringer.ProfileProvider"
+          android:authorities="com.hlidskialf.android.wringer"/>
     </application>
 </manifest> 

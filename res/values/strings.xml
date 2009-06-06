@@ -1,4 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WringerActivity</string>
+
+
+
+
+    <string name="profile_prefs_cat">Profile Settings</string>
+    <string name="name">Profile Name</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="notifytone">Notification Tone</string>
+
+    <string name="profile_prefs_cat_audio">Audio Settings</string>
+    <string name="profile_prefs_cat_volume">Volume Levels</string>
+    <string name="profile_prefs_cat_volume_summary">Volume and vibrate settings</string>
+    <string name="alarm_vol">Alarm Volume</string>
+    <string name="music_vol">Music Volume</string>
+    <string name="notify_vol">Notification Volume</string>
+    <string name="ringer_vol">Ringer Volume</string>
+    <string name="system_vol">System Sounds Volume</string>
+    <string name="voice_vol">Call Volume</string>
+    <string name="ringer_mode">Silent Mode</string>
+    <string name="ringer_vibrate">Ringer Vibrate</string>
+    <string name="ringer_vibrate_summary">Vibrate on incoming ring</string>
+    <string name="notify_vibrate">Notification Vibrate</string>
+    <string name="notify_vibrate_summary">Vibrate on notification</string>
+    <string name="play_soundfx">Play Sound Effects</string>
+    <string name="play_soundfx_summary">Play system keypress sound effects</string>
+
+    <string name="profile_prefs_cat_screen">Display Settings</string>
+    <string name="brightness">Screen Brightness</string>
+    <string name="screen_timeout">Screen Timeout</string>
+
+    <string name="profile_prefs_cat_devices">Devices Settings</string>
+    <string name="airplane_on">Airplane Mode</string>
+    <string name="airplane_on_summary">Turn off all radios</string>
+    <string name="profile_prefs_cat_radio">Radio Settings</string>
+    <string name="profile_prefs_cat_radio_summary">Wifi/Bluetooth/GPS Settings</string>
+    <string name="wifi_on">Wi-Fi</string>
+    <string name="wifi_on_summary">Toggle Wi-Fi on/off</string>
+    <string name="gps_on">GPS</string>
+    <string name="gps_on_summary">Toggle GPS on/off</string>
+    <string name="location_on">Wireless Location</string>
+    <string name="location_on_summary">Toggle Wireless Location on/off</string>
+    <string name="bluetooth_on">Bluetooth</string>
+    <string name="bluetooth_on_summary">Toggle Bluetooth on/off</string>
+    <string name="autosync_on">Auto-Sync</string>
+    <string name="autosync_on_summary">Toggle Auto-Sync on/off</string>
 </resources>
