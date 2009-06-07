@@ -71,6 +71,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
   @Override 
   protected void onBindDialogView(View v) {
     super.onBindDialogView(v);
+    mSeekBar.setMax(mMax);
     mSeekBar.setProgress(mValue);
   }
   @Override
@@ -87,10 +88,14 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
   {
     String t = String.valueOf(value);
     mValueText.setText(mSuffix == null ? t : t.concat(mSuffix));
-    persistInt(value);
+    if (shouldPersist())
+      persistInt(value);
+    callChangeListener(new Integer(value));
   }
   public void onStartTrackingTouch(SeekBar seek) {}
   public void onStopTrackingTouch(SeekBar seek) {}
-  
+
+  public void setMax(int max) { mMax = max; }
+  public int getMax() { return mMax; }
 }
 

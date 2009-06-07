@@ -10,7 +10,8 @@
     <string name="brightness">Screen Brightness</string>
     <string name="screen_timeout">Screen Timeout</string>
     <string name="autosync_on">Auto-Sync</string>
-    <string name="autosync_on_summary">Toggle Auto-Sync on/off</string>
+    <string name="autosync_on_summary_on">Synchronize online data</string>
+    <string name="autosync_on_summary_off">Don't Auto-Sync data</string>
 
     <string name="profile_prefs_cat_audio">Audio Settings</string>
     <string name="profile_prefs_cat_volume">Volume Levels</string>
@@ -23,30 +24,42 @@
     <string name="voice_vol">Call Volume</string>
     <string name="ringer_mode">Silent Mode</string>
     <string name="ringer_vibrate">Ringer Vibrate</string>
-    <string name="ringer_vibrate_summary">Vibrate on incoming ring</string>
+    <string name="ringer_vibrate_summary_on">Vibrate on incoming ring</string>
+    <string name="ringer_vibrate_summary_off">Don't vibrate on incoming ring</string>
     <string name="notify_vibrate">Notification Vibrate</string>
-    <string name="notify_vibrate_summary">Vibrate on notification</string>
+    <string name="notify_vibrate_summary_on">Vibrate on notification</string>
+    <string name="notify_vibrate_summary_off">Don't vibrate on notification</string>
     <string name="play_soundfx">Play Sound Effects</string>
-    <string name="play_soundfx_summary">Play system keypress sound effects</string>
+    <string name="play_soundfx_summary_on">Play system keypress sound effects</string>
+    <string name="play_soundfx_summary_off">No system keypress sound effects</string>
 
 
     <string name="profile_prefs_cat_devices">Device Settings</string>
     <string name="airplane_on">Airplane Mode</string>
-    <string name="airplane_on_summary">Turn off all radios</string>
+    <string name="airplane_on_summary_on">All radios off</string>
+    <string name="airplane_on_summary_off">Don't force radios off</string>
     <string name="profile_prefs_cat_radio">Radio Settings</string>
     <string name="profile_prefs_cat_radio_summary">Wifi/Bluetooth/GPS Settings</string>
     <string name="wifi_on">Wi-Fi</string>
-    <string name="wifi_on_summary">Toggle Wi-Fi on/off</string>
+    <string name="wifi_on_summary_on">Wi-Fi on</string>
+    <string name="wifi_on_summary_off">Wi-Fi off</string>
     <string name="gps_on">GPS</string>
-    <string name="gps_on_summary">Toggle GPS on/off</string>
+    <string name="gps_on_summary_on">GPS on</string>
+    <string name="gps_on_summary_off">GPS off</string>
     <string name="location_on">Wireless Location</string>
-    <string name="location_on_summary">Toggle Wireless Location on/off</string>
+    <string name="location_on_summary_on">Wireless Location on</string>
+    <string name="location_on_summary_off">Wireless Location off</string>
     <string name="bluetooth_on">Bluetooth</string>
-    <string name="bluetooth_on_summary">Toggle Bluetooth on/off</string>
+    <string name="bluetooth_on_summary_on">Bluetooth on</string>
+    <string name="bluetooth_on_summary_off">Bluetooth off</string>
 
     <string name="profile_prefs_cat_tone">Ringtones</string>
     <string name="ringtone">Default Ring Tone</string>
     <string name="notifytone">Default Notification Tone</string>
     <string name="profile_prefs_cat_contacts">Contact Ringtones</string>
     <string name="profile_prefs_cat_contacts_summary">Customize ringtones per contact</string>
+
+    <string name="ringer_mode_normal">Normal: Audible and may vibrate</string>
+    <string name="ringer_mode_vibrate">Vibrate: Muted but vibrates</string>
+    <string name="ringer_mode_silent">Silent: Muted and no vibration</string>
 </resources>

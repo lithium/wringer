@@ -4,18 +4,23 @@
     <EditTextPreference android:key="name"
       android:title="@string/name"
       android:maxLength="25"
+      persistent="false"
       />
     <com.hlidskialf.android.preference.SeekBarPreference android:key="brightness"
       android:title="@string/brightness"
       android:max="255"
+      persistent="false"
       />
     <com.hlidskialf.android.preference.SeekBarPreference android:key="screen_timeout"
       android:title="@string/screen_timeout"
       android:max="600"
+      persistent="false"
       />
     <CheckBoxPreference android:key="autosync_on"
       android:title="@string/autosync_on"
-      android:summary="@string/autosync_on_summary"
+      android:summaryOn="@string/autosync_on_summary_on"
+      android:summaryOff="@string/autosync_on_summary_off"
+      persistent="false"
       />
   </PreferenceCategory>
 
@@ -25,69 +30,88 @@
       <PreferenceCategory android:title="@string/profile_prefs_cat_volume"/>
       <com.hlidskialf.android.preference.SeekBarPreference android:key="alarm_vol"
         android:title="@string/alarm_vol"
-        android:max="10"
+        persistent="false"
         />
       <com.hlidskialf.android.preference.SeekBarPreference android:key="music_vol"
         android:title="@string/music_vol"
-        android:max="10"
+        persistent="false"
         />
       <com.hlidskialf.android.preference.SeekBarPreference android:key="notify_vol"
         android:title="@string/notify_vol"
-        android:max="10"
+        persistent="false"
         />
       <com.hlidskialf.android.preference.SeekBarPreference android:key="ringer_vol"
         android:title="@string/ringer_vol"
-        android:max="10"
+        persistent="false"
         />
       <com.hlidskialf.android.preference.SeekBarPreference android:key="system_vol"
         android:title="@string/system_vol"
-        android:max="10"
+        persistent="false"
         />
       <com.hlidskialf.android.preference.SeekBarPreference android:key="voice_vol"
         android:title="@string/voice_vol"
-        android:max="10"
+        persistent="false"
         />
     </PreferenceScreen>
-    <CheckBoxPreference android:key="ringer_mode"
+    <ListPreference android:key="ringer_mode"
       android:title="@string/ringer_mode"
+      persistent="false"
+      android:entries="@array/ringer_modes"
+      android:entryValues="@array/ringer_mode_values"
       />
     <CheckBoxPreference android:key="ringer_vibrate"
       android:title="@string/ringer_vibrate"
-      android:summary="@string/ringer_vibrate_summary"
+      persistent="false"
+      android:summaryOn="@string/ringer_vibrate_summary_on"
+      android:summaryOff="@string/ringer_vibrate_summary_off"
       />
     <CheckBoxPreference android:key="notify_vibrate"
       android:title="@string/notify_vibrate"
-      android:summary="@string/notify_vibrate_summary"
+      persistent="false"
+      android:summaryOn="@string/notify_vibrate_summary_on"
+      android:summaryOff="@string/notify_vibrate_summary_off"
       />
     <CheckBoxPreference android:key="play_soundfx"
       android:title="@string/play_soundfx"
-      android:summary="@string/play_soundfx_summary"
+      persistent="false"
+      android:summaryOn="@string/play_soundfx_summary_on"
+      android:summaryOff="@string/play_soundfx_summary_off"
       />
   </PreferenceCategory>
 
   <PreferenceCategory android:title="@string/profile_prefs_cat_devices">
     <CheckBoxPreference android:key="airplane_on"
       android:title="@string/airplane_on"
-      android:summary="@string/airplane_on_summary"
+      persistent="false"
+      android:summaryOn="@string/airplane_on_summary_on"
+      android:summaryOff="@string/airplane_on_summary_off"
       />
     <PreferenceScreen android:title="@string/profile_prefs_cat_radio"
                       android:summary="@string/profile_prefs_cat_radio_summary">
       <PreferenceCategory android:title="@string/profile_prefs_cat_radio"/>
       <CheckBoxPreference android:key="wifi_on"
         android:title="@string/wifi_on"
-        android:summary="@string/wifi_on_summary"
+        persistent="false"
+        android:summaryOn="@string/wifi_on_summary_on"
+        android:summaryOff="@string/wifi_on_summary_off"
         />
       <CheckBoxPreference android:key="gps_on"
         android:title="@string/gps_on"
-        android:summary="@string/gps_on_summary"
+        persistent="false"
+        android:summaryOn="@string/gps_on_summary_on"
+        android:summaryOff="@string/gps_on_summary_off"
         />
       <CheckBoxPreference android:key="location_on"
         android:title="@string/location_on"
-        android:summary="@string/location_on_summary"
+        persistent="false"
+        android:summaryOn="@string/location_on_summary_on"
+        android:summaryOff="@string/location_on_summary_off"
         />
       <CheckBoxPreference android:key="bluetooth_on"
         android:title="@string/bluetooth_on"
-        android:summary="@string/bluetooth_on_summary"
+        persistent="false"
+        android:summaryOn="@string/bluetooth_on_summary_on"
+        android:summaryOff="@string/bluetooth_on_summary_off"
         />
     </PreferenceScreen>
   </PreferenceCategory>
@@ -95,16 +119,19 @@
   <PreferenceCategory android:title="@string/profile_prefs_cat_tone">
     <RingtonePreference android:key="ringtone"
       android:title="@string/ringtone"
+      persistent="false"
       android:showDefault="true"
       android:showSilent="true"
       />
     <RingtonePreference android:key="notifytone"
       android:title="@string/notifytone"
+      persistent="false"
       android:showDefault="true"
       android:showSilent="true"
       />
     <PreferenceScreen android:key="contacts"
       android:title="@string/profile_prefs_cat_contacts"
+      persistent="false"
       android:summary="@string/profile_prefs_cat_contacts_summary"/>
   </PreferenceCategory>
 

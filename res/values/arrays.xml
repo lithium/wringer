@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="ringer_modes">
+    <item>Normal: Audible and may vibrate</item>
+    <item>Vibrate: Muted but vibrates</item>
+    <item>Silent: Muted and no vibration</item>
+  </string-array>
+  <string-array name="ringer_mode_values">
+    <item>normal</item>
+    <item>vibrate</item>
+    <item>silent</item>
+  </string-array>
+</resources>
