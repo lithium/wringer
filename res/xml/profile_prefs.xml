@@ -24,6 +24,27 @@
       />
   </PreferenceCategory>
 
+  <PreferenceCategory android:title="@string/profile_prefs_cat_tone">
+    <RingtonePreference android:key="ringtone"
+      android:title="@string/ringtone"
+      persistent="false"
+      android:showDefault="true"
+      android:showSilent="true"
+      />
+    <RingtonePreference android:key="notifytone"
+      android:title="@string/notifytone"
+      persistent="false"
+      android:showDefault="true"
+      android:showSilent="true"
+      />
+    <PreferenceScreen android:key="contacts"
+      android:title="@string/profile_prefs_cat_contacts"
+      persistent="false"
+      android:summary="@string/profile_prefs_cat_contacts_summary"
+      >
+    </PreferenceScreen>
+  </PreferenceCategory>
+
   <PreferenceCategory android:title="@string/profile_prefs_cat_audio">
     <PreferenceScreen android:title="@string/profile_prefs_cat_volume"
                       android:summary="@string/profile_prefs_cat_volume_summary">
@@ -116,23 +137,5 @@
     </PreferenceScreen>
   </PreferenceCategory>
 
-  <PreferenceCategory android:title="@string/profile_prefs_cat_tone">
-    <RingtonePreference android:key="ringtone"
-      android:title="@string/ringtone"
-      persistent="false"
-      android:showDefault="true"
-      android:showSilent="true"
-      />
-    <RingtonePreference android:key="notifytone"
-      android:title="@string/notifytone"
-      persistent="false"
-      android:showDefault="true"
-      android:showSilent="true"
-      />
-    <PreferenceScreen android:key="contacts"
-      android:title="@string/profile_prefs_cat_contacts"
-      persistent="false"
-      android:summary="@string/profile_prefs_cat_contacts_summary"/>
-  </PreferenceCategory>
 
 </PreferenceScreen>

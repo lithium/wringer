@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  >
+  <LinearLayout android:id="@+id/button_bar"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_alignParentBottom="true"
+    android:background="@android:drawable/bottom_bar"
+    android:layout_marginTop="1dip"
+    >
+    <Button android:id="@android:id/button1"
+      android:layout_height="wrap_content" 
+      android:layout_width="0dip" 
+      android:layout_weight="1" 
+      android:layout_gravity="center_vertical"
+      android:text="@android:string/ok"
+      />
+    <Button android:id="@android:id/button2"
+      android:layout_height="wrap_content" 
+      android:layout_width="0dip" 
+      android:layout_weight="1" 
+      android:text="@android:string/cancel"
+      android:layout_gravity="center_vertical"
+      />
+  </LinearLayout>
+  <ListView android:id="@android:id/list"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:layout_above="@id/button_bar"
+    />
+</RelativeLayout>

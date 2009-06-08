@@ -6,12 +6,14 @@ import android.content.Intent;
 
 public class WringerActivity extends Activity
 {
+  public static final int REQUEST_SET_PROFILE=1;
+
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    startActivity(new Intent(this, SetProfile.class));
+    startActivityForResult(new Intent(this, SetProfile.class), REQUEST_SET_PROFILE);
   }
 }

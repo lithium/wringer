@@ -147,7 +147,8 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     });
 
     mPrefContacts = findPreference("contacts");
-    //mPrefContacts.setIntent(new Intent(this, SetProfileContacts.class));
+    Intent contacts_intent = new Intent(this, SetProfileContacts.class); 
+    mPrefContacts.setIntent(contacts_intent);
 
     Intent i = getIntent();
     mId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
