@@ -3,6 +3,8 @@ package com.hlidskialf.android.wringer;
 import android.provider.BaseColumns;
 import android.net.Uri;
 import android.content.ContentResolver;
+import java.util.HashMap;
+import android.database.Cursor;
 
 public class ProfileModel
 {
@@ -91,5 +93,23 @@ public class ProfileModel
 
   public static void getProfile(ContentResolver resolver, ProfileReporter reporter, int profileId)
   {
+  }
+
+  public static HashMap<Integer,Uri> getAllContactRingtones(ContentResolver resolver, int profile_id)
+  {
+    Cursor cursor = resolver.query(ProfileContactColumns.CONTENT_URI, 
+      new String[] {ProfileContactColumns.CONTACT_ID, ProfileContactColumns.RINGTONE},
+      ProfileContactColumns.PROFILE_ID+"=?", 
+      new String[] {String.valueOf(profile_id)}, null);
+    HashMap<Integer,Uri> ret = new HashMap<Integer,Uri>(cursor.getCount());
+    if (cursor.moveToFirst()) {
+      do {
+        int contact_id = cursor.getInt(0);
+        String ringtone = cursor.getString(1);
+        ret.put(contact_id, Uri.parse(ringtone));
+      } while (cursor.moveToNext());
+    }
+    cursor.close();
+    return ret;
   }
 }

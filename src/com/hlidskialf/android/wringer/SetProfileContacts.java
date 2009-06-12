@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.RingtoneManager;
@@ -28,6 +29,8 @@ public class SetProfileContacts extends ListActivity
   private Cursor mPeopleCursor;
   private long mPickingId;
   private ProfileContactsAdapter mListAdapter;
+  private int mProfileId;
+  private HashMap<Integer,Uri> mRingtones;
 
   class ProfileContactsAdapter extends CursorAdapter 
   {
@@ -41,6 +44,7 @@ public class SetProfileContacts extends ListActivity
       mIdIdx = cursor.getColumnIndexOrThrow(People._ID);
       mNameIdx = cursor.getColumnIndexOrThrow(People.NAME);
 
+      // cache up the profile photos
       mPhotos = new HashMap<Integer,Bitmap>();
       cursor.moveToFirst();
       do {
@@ -52,6 +56,7 @@ public class SetProfileContacts extends ListActivity
         }
       } while (cursor.moveToNext());
       cursor.moveToFirst();
+
     }
     @Override
     public void bindView(View v, Context context, Cursor cursor) {
@@ -65,6 +70,11 @@ public class SetProfileContacts extends ListActivity
       if (mPhotos.containsKey(id)) {
         ImageView iv = (ImageView)v.findViewById(android.R.id.icon);
         iv.setImageBitmap(mPhotos.get(id));
+      }
+
+      if (mRingtones.containsKey(id)) {
+        tv = (TextView)v.findViewById(android.R.id.text2);
+        tv.setText( Wringer.getRingtoneTitle(context, mRingtones.get(id)) ); 
       }
 
     }
@@ -81,6 +91,12 @@ public class SetProfileContacts extends ListActivity
   {
     super.onCreate(icicle);
     setContentView(R.layout.contacts_list);
+
+    Intent i = getIntent();
+    mProfileId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
+
+    //fetch the existing ringtones for this profile
+    mRingtones = ProfileModel.getAllContactRingtones(getContentResolver(), mProfileId);
 
     Button b;
     b = (Button)findViewById(android.R.id.button1);
@@ -120,6 +136,15 @@ public class SetProfileContacts extends ListActivity
     if (result != RESULT_OK) return;
     if (request == REQUEST_RINGTONE) {
       Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+
+      ContentValues values = new ContentValues(3);
+      values.put(ProfileModel.ProfileContactColumns.PROFILE_ID, mProfileId);
+      values.put(ProfileModel.ProfileContactColumns.CONTACT_ID, (int)mPickingId);
+      values.put(ProfileModel.ProfileContactColumns.RINGTONE, uri.toString());
+
+      getContentResolver().insert(ProfileModel.ProfileContactColumns.CONTENT_URI, values);
+      mRingtones.put((int)mPickingId, uri);
+
       android.util.Log.v("picked", String.valueOf(mPickingId)+": "+uri.toString());
       mPickingId = -1;
     }

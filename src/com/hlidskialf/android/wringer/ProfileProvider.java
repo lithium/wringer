@@ -17,11 +17,15 @@ public class ProfileProvider extends ContentProvider {
 
   public static final int URI_MATCH_PROFILE=1;
   public static final int URI_MATCH_PROFILE_ID=2;
+  public static final int URI_MATCH_PROFILE_CONTACT=3;
+  public static final int URI_MATCH_PROFILE_CONTACT_ID=4;
   public static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
  
   static {
     sUriMatcher.addURI(Wringer.PACKAGE_NAME, "profile",   URI_MATCH_PROFILE);
     sUriMatcher.addURI(Wringer.PACKAGE_NAME, "profile/#", URI_MATCH_PROFILE_ID);
+    sUriMatcher.addURI(Wringer.PACKAGE_NAME, "profile_contact",   URI_MATCH_PROFILE_CONTACT);
+    sUriMatcher.addURI(Wringer.PACKAGE_NAME, "profile_contact/#", URI_MATCH_PROFILE_CONTACT_ID);
   }
 
   private static class ProfileDatabaseHelper extends SQLiteOpenHelper {
@@ -95,22 +99,29 @@ public class ProfileProvider extends ContentProvider {
 
   @Override
   public Uri insert(Uri uri, ContentValues values) {
-    if (sUriMatcher.match(uri) != URI_MATCH_PROFILE) {
-      throw new IllegalArgumentException("Cannot insert into URI: " + uri);
-    }
-
     if (values == null) {
       throw new IllegalArgumentException("Missing required fields: " + uri);
     }
 
-    // default values...
-
     SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-    long id = db.insert(ProfileModel.ProfileColumns.TABLE_NAME, ProfileModel.ProfileColumns.NAME, values);
+    long id;
+    Uri new_uri;
+
+    switch(sUriMatcher.match(uri)) {
+      case URI_MATCH_PROFILE:
+        id = db.insert(ProfileModel.ProfileColumns.TABLE_NAME, ProfileModel.ProfileColumns.NAME, values);
+        new_uri = ContentUris.withAppendedId(ProfileModel.ProfileColumns.CONTENT_URI, id);
+        break;
+      case URI_MATCH_PROFILE_CONTACT:
+        id = db.insert(ProfileModel.ProfileContactColumns.TABLE_NAME, ProfileModel.ProfileContactColumns.RINGTONE, values);
+        new_uri = ContentUris.withAppendedId(ProfileModel.ProfileContactColumns.CONTENT_URI, id);
+        break;
+      default:
+        throw new IllegalArgumentException("Cannot insert into URI: " + uri);
+    }
+
     if (id < 0)
       throw new SQLException("Failed to insert row into "+uri);
-
-    Uri new_uri = ContentUris.withAppendedId(ProfileModel.ProfileColumns.CONTENT_URI, id);
     getContext().getContentResolver().notifyChange(new_uri, null);
     return new_uri;
   }
@@ -167,6 +178,9 @@ public class ProfileProvider extends ContentProvider {
         qb.setTables(ProfileModel.ProfileColumns.TABLE_NAME);
         qb.appendWhere("_id=");
         qb.appendWhere(uri.getPathSegments().get(1));
+        break;
+      case URI_MATCH_PROFILE_CONTACT:
+        qb.setTables(ProfileModel.ProfileContactColumns.TABLE_NAME);
         break;
       default:
         throw new IllegalArgumentException("Unknown URI: " + uri);
