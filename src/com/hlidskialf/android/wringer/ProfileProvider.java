@@ -46,7 +46,7 @@ public class ProfileProvider extends ContentProvider {
         "ringer_volume INTEGER, "+
         "system_volume INTEGER, "+
         "voice_volume INTEGER, "+
-        "ringer_mode INTEGER, "+
+        "ringer_mode STRING, "+
         "ringer_vibrate INTEGER, "+
         "notify_vibrate INTEGER, "+
         "play_soundfx INTEGER, "+

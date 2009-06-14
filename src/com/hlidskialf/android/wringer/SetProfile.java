@@ -21,19 +21,20 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
 {
   private ContentResolver mResolver;
   private Uri mContentUri;
+  private Intent mContactsIntent = null;
 
   private int mId;
   private String mName;
   private int mVolAlarm, mVolMusic, mVolNotify, mVolRinger, mVolSystem, mVolVoice;
-  private int mRingerMode;
-  private boolean mRingerVibrate, mNotifyVibrate, mPlaySoundFx;
+  private String mRingerMode;
+  private boolean mRingerVibrate, mNotifyVibrate, mPlaySoundfx;
   private String mRingtone, mNotifytone;
   private boolean mAirplaneOn, mWifiOn, mGpsOn, mLocationOn, mBluetoothOn, mAutoSyncOn;
   private int mBrightness, mTimeout;
 
   private EditTextPreference mPrefName;
   private SeekBarPreference mPrefBrightness, mPrefTimeout, mPrefVolAlarm, mPrefVolMusic, mPrefVolNotify, mPrefVolRinger, mPrefVolSystem, mPrefVolVoice;
-  private CheckBoxPreference mPrefAutosync, mPrefRingerVibrate, mPrefNotifyVibrate, mPrefPlaySoundFx, mPrefAirplane, mPrefWifi, mPrefGps, mPrefLocation, mPrefBluetooth;
+  private CheckBoxPreference mPrefAutosync, mPrefRingerVibrate, mPrefNotifyVibrate, mPrefPlaySoundfx, mPrefAirplane, mPrefWifi, mPrefGps, mPrefLocation, mPrefBluetooth;
   private RingtonePreference mPrefRingtone, mPrefNotifytone;
   private ListPreference mPrefRingerMode;
   private Preference mPrefContacts; 
@@ -42,39 +43,47 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
   protected void onCreate(Bundle icicle)
   {
     super.onCreate(icicle);
-
-    AudioManager audio_mgr = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-
     addPreferencesFromResource(R.xml.profile_prefs);
+
+    setup_preferences();
+
+    mResolver = getContentResolver();
+    
+    Intent i = getIntent();
+    mId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
+    ProfileModel.getProfile(mResolver, this, mId);
+  }
+
+  private void setup_preferences()
+  {
+    AudioManager audio_mgr = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
     mPrefName = (EditTextPreference)findPreference("name");
     mPrefName.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateName((String)newValue);
+        update_name((String)newValue, true);
         return true;
       }
     });
-
     mPrefBrightness = (SeekBarPreference)findPreference("brightness");
     mPrefBrightness.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateBrightness((Integer)newValue);
+        update_brightness((Integer)newValue, true);
         return true;
       }
     });
     mPrefTimeout = (SeekBarPreference)findPreference("screen_timeout");
     mPrefTimeout.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateTimeout((Integer)newValue);
+        update_timeout((Integer)newValue, true);
         return true;
       }
     });
-
     mPrefVolAlarm = (SeekBarPreference)findPreference("alarm_vol");
     mPrefVolAlarm.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_ALARM));
     mPrefVolAlarm.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolAlarm((Integer)newValue);
+        update_alarm_vol((Integer)newValue, true);
         return true;
       }
     });
@@ -82,7 +91,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefVolMusic.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
     mPrefVolMusic.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolMusic((Integer)newValue);
+        update_music_vol((Integer)newValue, true);
         return true;
       }
     });
@@ -90,7 +99,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefVolNotify.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION));
     mPrefVolNotify.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolNotify((Integer)newValue);
+        update_notify_vol((Integer)newValue, true);
         return true;
       }
     });
@@ -98,7 +107,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefVolRinger.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_RING));
     mPrefVolRinger.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolRinger((Integer)newValue);
+        update_ringer_vol((Integer)newValue, true);
         return true;
       }
     });
@@ -106,7 +115,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefVolSystem.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));
     mPrefVolSystem.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolSystem((Integer)newValue);
+        update_system_vol((Integer)newValue, true);
         return true;
       }
     });
@@ -114,89 +123,134 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefVolVoice.setMax(audio_mgr.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL));
     mPrefVolVoice.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateVolVoice((Integer)newValue);
+        update_voice_vol((Integer)newValue, true);
         return true;
       }
     });
     mPrefRingerMode = (ListPreference)findPreference("ringer_mode");
     mPrefRingerMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateRingerMode((String)newValue);
+        update_ringer_mode((String)newValue, true);
         return true;
       }
     });
-
     mPrefAutosync = (CheckBoxPreference)findPreference("autosync_on");
+    mPrefAutosync.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_autosync((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefRingerVibrate = (CheckBoxPreference)findPreference("ringer_vibrate");
+    mPrefRingerVibrate.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_ringer_vibrate((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefNotifyVibrate = (CheckBoxPreference)findPreference("notify_vibrate");
-    mPrefPlaySoundFx = (CheckBoxPreference)findPreference("play_soundfx");
+    mPrefNotifyVibrate.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_notify_vibrate((Boolean)newValue, true);
+        return true;
+      }
+    });
+    mPrefPlaySoundfx = (CheckBoxPreference)findPreference("play_soundfx");
+    mPrefPlaySoundfx.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_play_soundfx((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefAirplane = (CheckBoxPreference)findPreference("airplane_on");
+    mPrefAirplane.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_airplane((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefWifi = (CheckBoxPreference)findPreference("wifi_on");
+    mPrefWifi.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_wifi((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefGps = (CheckBoxPreference)findPreference("gps_on");
+    mPrefGps.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_gps((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefLocation = (CheckBoxPreference)findPreference("location_on");
+    mPrefLocation.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_location((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefBluetooth = (CheckBoxPreference)findPreference("bluetooth_on");
-
+    mPrefBluetooth.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+        update_bluetooth((Boolean)newValue, true);
+        return true;
+      }
+    });
     mPrefRingtone = (RingtonePreference)findPreference("ringtone");
     mPrefRingtone.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateRingtone((String)newValue);
+        update_ringtone((String)newValue, true);
         return true;
       }
     });
     mPrefNotifytone = (RingtonePreference)findPreference("notifytone");
     mPrefNotifytone.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        updateNotifytone((String)newValue);
+        update_notifytone((String)newValue, true);
         return true;
       }
     });
 
-    mResolver = getContentResolver();
-    
-    Intent i = getIntent();
-    mId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
-    ProfileModel.getProfile(mResolver, this, mId);
-
     mPrefContacts = findPreference("contacts");
-    Intent contacts_intent = new Intent(this, SetProfileContacts.class); 
-    contacts_intent.putExtra(Wringer.EXTRA_PROFILE_ID, mId);
-    mPrefContacts.setIntent(contacts_intent);
 
   }
-
-
 
 
   public void reportProfile(
       int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
-      int ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
+      String ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
       String ringtone, String notifytone, 
       boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on, boolean autosync_on, int brightness, int screen_timeout) 
   {
     mId = id;
     mContentUri = Uri.withAppendedPath(ProfileModel.ProfileColumns.CONTENT_URI, String.valueOf(mId));
-    mName = name;
-    mVolAlarm = alarm_vol;
-    mVolMusic = music_vol;
-    mVolNotify = notify_vol;
-    mVolRinger = ringer_vol;
-    mVolSystem = system_vol;
-    mVolVoice = voice_vol;
-    mRingerMode = ringer_mode;
-    mRingerVibrate = ringer_vibrate;
-    mNotifyVibrate = notify_vibrate;
-    mPlaySoundFx = play_soundfx;
-    mRingtone = ringtone;
-    mNotifytone = notifytone;
-    mAirplaneOn = airplane_on;
-    mWifiOn = wifi_on;
-    mGpsOn = gps_on;
-    mLocationOn = location_on;
-    mBluetoothOn = bluetooth_on;
-    mAutoSyncOn = autosync_on;
-    mBrightness = brightness;
-    mTimeout = screen_timeout;
+    update_name(name, false);
+    update_alarm_vol(alarm_vol, false);
+    update_music_vol(music_vol, false);
+    update_notify_vol(notify_vol, false);
+    update_ringer_vol(ringer_vol, false);
+    update_system_vol(system_vol, false);
+    update_voice_vol(voice_vol, false);
+    update_ringer_mode(ringer_mode, false);
+    update_ringer_vibrate(ringer_vibrate, false); mPrefRingerVibrate.setChecked(ringer_vibrate);
+    update_notify_vibrate(notify_vibrate, false); mPrefNotifyVibrate.setChecked(notify_vibrate);
+    update_play_soundfx(play_soundfx, false); mPrefPlaySoundfx.setChecked(play_soundfx);
+    update_ringtone(ringtone, false);
+    update_notifytone(notifytone, false);
+    update_airplane(airplane_on, false); mPrefAirplane.setChecked(airplane_on);
+    update_wifi(wifi_on, false); mPrefWifi.setChecked(wifi_on);
+    update_gps(gps_on, false); mPrefGps.setChecked(gps_on);
+    update_location(location_on, false); mPrefLocation.setChecked(location_on);
+    update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
+    update_autosync(autosync_on, false); mPrefAutosync.setChecked(autosync_on);
+    update_brightness(brightness, false);
+    update_timeout(screen_timeout, false);
+
+    mContactsIntent = new Intent(this, SetProfileContacts.class); 
+    mContactsIntent.putExtra(Wringer.EXTRA_PROFILE_ID, mId);
+    mPrefContacts.setIntent(mContactsIntent);
   }
 
   private void update_column(String key, String value)
@@ -211,77 +265,151 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     values.put(key, value);
     mResolver.update(mContentUri, values, null, null);
   }
-
-  public void updateName(String name) {
-    mPrefName.setSummary(mName = name);
-    update_column(ProfileModel.ProfileColumns.NAME, mName);
+  private void update_column(String key, boolean value)
+  {
+    ContentValues values = new ContentValues(1);
+    values.put(key, (int)(value ? 1 : 0));
+    mResolver.update(mContentUri, values, null, null);
   }
-  public void updateVolAlarm(int vol) {
+
+  private void update_name(String name, boolean save) {
+    mPrefName.setSummary(mName = name);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.NAME, mName);
+  }
+  private void update_alarm_vol(int vol, boolean save) {
     mVolAlarm = vol;
     mPrefVolAlarm.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolAlarm.getMax()));
-    update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolAlarm);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolAlarm);
   }
-  public void updateVolMusic(int vol) {
+  private void update_music_vol(int vol, boolean save) {
     mVolMusic = vol;
     mPrefVolMusic.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolMusic.getMax()));
-    update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolMusic);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolMusic);
   }
-  public void updateVolNotify(int vol) {
+  private void update_notify_vol(int vol, boolean save) {
     mVolNotify = vol;
     mPrefVolNotify.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolNotify.getMax()));
-    update_column(ProfileModel.ProfileColumns.NOTIFY_VOLUME, mVolNotify);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.NOTIFY_VOLUME, mVolNotify);
   }
-  public void updateVolRinger(int vol) {
+  private void update_ringer_vol(int vol, boolean save) {
     mVolRinger = vol;
     mPrefVolRinger.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolRinger.getMax()));
-    update_column(ProfileModel.ProfileColumns.RINGER_VOLUME, mVolRinger);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.RINGER_VOLUME, mVolRinger);
   }
-  public void updateVolSystem(int vol) {
+  private void update_system_vol(int vol, boolean save) {
     mVolSystem = vol;
     mPrefVolSystem.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolSystem.getMax()));
-    update_column(ProfileModel.ProfileColumns.SYSTEM_VOLUME, mVolSystem);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.SYSTEM_VOLUME, mVolSystem);
   }
-  public void updateVolVoice(int vol) {
+  private void update_voice_vol(int vol, boolean save) {
     mVolVoice = vol;
     mPrefVolVoice.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolVoice.getMax()));
-    update_column(ProfileModel.ProfileColumns.VOICE_VOLUME, mVolVoice);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.VOICE_VOLUME, mVolVoice);
   }
-  public void updateRingerMode(String mode) {
-    if (mode.equals("normal")) { 
-      mRingerMode = AudioManager.RINGER_MODE_NORMAL; 
+  private void update_ringer_mode(String mode, boolean save) {
+    mRingerMode = mode;
+    if (mode == null || mode.equals("normal")) { 
       mPrefRingerMode.setSummary(R.string.ringer_mode_normal);
     } 
     else if (mode.equals("vibrate")) { 
-      mRingerMode = AudioManager.RINGER_MODE_VIBRATE; 
       mPrefRingerMode.setSummary(R.string.ringer_mode_vibrate);
     } 
     else if (mode.equals("silent")) { 
-      mRingerMode = AudioManager.RINGER_MODE_SILENT; 
       mPrefRingerMode.setSummary(R.string.ringer_mode_silent);
     }
-    update_column(ProfileModel.ProfileColumns.RINGER_MODE, mRingerMode);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.RINGER_MODE, mRingerMode);
   }
-  public void updateBrightness(int brightness) {
+  private void update_brightness(int brightness, boolean save) {
     mPrefBrightness.setSummary(String.valueOf(mBrightness = brightness) +" / 255");
-    update_column(ProfileModel.ProfileColumns.BRIGHTNESS, mBrightness);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.BRIGHTNESS, mBrightness);
   }
-  public void updateTimeout(int timeout) {
+  private void update_timeout(int timeout, boolean save) {
     mPrefTimeout.setSummary(String.valueOf(mTimeout = timeout) +" seconds");
-    update_column(ProfileModel.ProfileColumns.SCREEN_TIMEOUT, mTimeout);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.SCREEN_TIMEOUT, mTimeout);
   }
-  public void updateRingtone(String uri) {
+  private void update_ringtone(String uri, boolean save) {
     mRingtone = uri;
+    if (uri == null) return;
     Ringtone tone = RingtoneManager.getRingtone(this, Uri.parse(uri));
     if (tone != null)
       mPrefRingtone.setSummary(tone.getTitle(this));
-    update_column(ProfileModel.ProfileColumns.RINGTONE, mRingtone);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.RINGTONE, mRingtone);
   }
-  public void updateNotifytone(String uri) {
+  private void update_notifytone(String uri, boolean save) {
     mNotifytone = uri;
+    if (uri == null) return;
     Ringtone tone = RingtoneManager.getRingtone(this, Uri.parse(uri));
     if (tone != null)
       mPrefNotifytone.setSummary(tone.getTitle(this));
-    update_column(ProfileModel.ProfileColumns.NOTIFYTONE, mNotifytone);
+    if (save)
+      update_column(ProfileModel.ProfileColumns.NOTIFYTONE, mNotifytone);
   }
+
+  private void update_ringer_vibrate(boolean is_on, boolean save)
+  {
+    mRingerVibrate = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.RINGER_VIBRATE, mRingerVibrate);
+  }
+  private void update_notify_vibrate(boolean is_on, boolean save)
+  {
+    mNotifyVibrate = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.NOTIFY_VIBRATE, mNotifyVibrate);
+  }
+  private void update_play_soundfx(boolean is_on, boolean save)
+  {
+    mPlaySoundfx = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.NOTIFY_VIBRATE, mNotifyVibrate);
+  }
+  private void update_airplane(boolean is_on, boolean save)
+  {
+    mAirplaneOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.AIRPLANE_ON, mAirplaneOn);
+  }
+  private void update_wifi(boolean is_on, boolean save)
+  {
+    mWifiOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.WIFI_ON, mWifiOn);
+  }
+  private void update_gps(boolean is_on, boolean save)
+  {
+    mGpsOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.GPS_ON, mGpsOn);
+  }
+  private void update_location(boolean is_on, boolean save)
+  {
+    mLocationOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.LOCATION_ON, mLocationOn);
+  }
+  private void update_bluetooth(boolean is_on, boolean save)
+  {
+    mBluetoothOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.BLUETOOTH_ON, mBluetoothOn);
+  }
+  private void update_autosync(boolean is_on, boolean save)
+  {
+    mAutoSyncOn = is_on;
+    if (save)
+      update_column(ProfileModel.ProfileColumns.AUTOSYNC_ON, mAutoSyncOn);
+  }
+
 
 }

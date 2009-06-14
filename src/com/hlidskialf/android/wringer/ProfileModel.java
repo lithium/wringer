@@ -86,7 +86,7 @@ public class ProfileModel
     public void reportProfile(
       int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
-      int ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
+      String ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
       String ringtone, String notifytone, 
       boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on,
       boolean autosync_on, int brightness, int screen_timeout 
@@ -115,7 +115,7 @@ public class ProfileModel
         cursor.getInt(ProfileColumns.RINGER_VOLUME_INDEX),
         cursor.getInt(ProfileColumns.SYSTEM_VOLUME_INDEX),
         cursor.getInt(ProfileColumns.VOICE_VOLUME_INDEX),
-        cursor.getInt(ProfileColumns.RINGER_MODE_INDEX),
+        cursor.getString(ProfileColumns.RINGER_MODE_INDEX),
         cursor.getInt(ProfileColumns.RINGER_VIBRATE_INDEX) == 0 ? false : true,
         cursor.getInt(ProfileColumns.NOTIFY_VIBRATE_INDEX) == 0 ? false : true,
         cursor.getInt(ProfileColumns.PLAY_SOUNDFX_INDEX) == 0 ? false : true,
@@ -138,8 +138,7 @@ public class ProfileModel
   {
     Cursor cursor = resolver.query(ProfileContactColumns.CONTENT_URI, 
       new String[] {ProfileContactColumns.CONTACT_ID, ProfileContactColumns.RINGTONE},
-      ProfileContactColumns.PROFILE_ID+"=?", 
-      new String[] {String.valueOf(profile_id)}, null);
+      ProfileContactColumns.PROFILE_ID+"="+profile_id, null, null);
     HashMap<Integer,Uri> ret = new HashMap<Integer,Uri>(cursor.getCount());
     if (cursor.moveToFirst()) {
       do {
