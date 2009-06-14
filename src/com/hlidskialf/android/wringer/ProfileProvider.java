@@ -29,7 +29,7 @@ public class ProfileProvider extends ContentProvider {
   }
 
   private static class ProfileDatabaseHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "mimetypes.db";
+    private static final String DATABASE_NAME = "profiles.db";
     private static final int DATABASE_VERSION = 1;
  
     public ProfileDatabaseHelper(Context context) {

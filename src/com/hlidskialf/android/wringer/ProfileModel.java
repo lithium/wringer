@@ -1,9 +1,11 @@
 package com.hlidskialf.android.wringer;
 
 import android.provider.BaseColumns;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.content.ContentResolver;
 import java.util.HashMap;
+import java.util.List;
 import android.database.Cursor;
 
 public class ProfileModel
@@ -84,15 +86,52 @@ public class ProfileModel
     public void reportProfile(
       int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
-      int ringer_mode, int ringer_vibrate, int notify_vibrate, boolean play_soundfx,
+      int ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
       String ringtone, String notifytone, 
       boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on,
       boolean autosync_on, int brightness, int screen_timeout 
     );
   }
 
-  public static void getProfile(ContentResolver resolver, ProfileReporter reporter, int profileId)
+  public static int newProfile(ContentResolver resolver)
   {
+    Uri new_uri = resolver.insert(ProfileModel.ProfileColumns.CONTENT_URI, new ContentValues());
+    List<String> segments = new_uri.getPathSegments();
+    return Integer.valueOf( segments.get(1) );
+  }
+
+  public static void getProfile(ContentResolver resolver, ProfileReporter reporter, int profile_id)
+  {
+    if (reporter == null) 
+      return;
+    Cursor cursor = resolver.query(ProfileColumns.CONTENT_URI, ProfileColumns.QUERY_COLUMNS,
+      ProfileColumns._ID+"=?", new String[] {String.valueOf(profile_id)}, null);
+    if (cursor.moveToFirst()) {
+      reporter.reportProfile(cursor.getInt(ProfileColumns.ID_INDEX), 
+        cursor.getString(ProfileColumns.NAME_INDEX),
+        cursor.getInt(ProfileColumns.ALARM_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.MUSIC_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.NOTIFY_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.RINGER_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.SYSTEM_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.VOICE_VOLUME_INDEX),
+        cursor.getInt(ProfileColumns.RINGER_MODE_INDEX),
+        cursor.getInt(ProfileColumns.RINGER_VIBRATE_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.NOTIFY_VIBRATE_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.PLAY_SOUNDFX_INDEX) == 0 ? false : true,
+        cursor.getString(ProfileColumns.RINGTONE_INDEX),
+        cursor.getString(ProfileColumns.NOTIFYTONE_INDEX),
+        cursor.getInt(ProfileColumns.AIRPLANE_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.WIFI_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.GPS_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.LOCATION_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.BLUETOOTH_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.AUTOSYNC_ON_INDEX) == 0 ? false : true,
+        cursor.getInt(ProfileColumns.BRIGHTNESS_INDEX),
+        cursor.getInt(ProfileColumns.SCREEN_TIMEOUT_INDEX)
+      );
+    }
+    cursor.close();
   }
 
   public static HashMap<Integer,Uri> getAllContactRingtones(ContentResolver resolver, int profile_id)

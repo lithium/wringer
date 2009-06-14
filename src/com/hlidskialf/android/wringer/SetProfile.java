@@ -2,6 +2,8 @@ package com.hlidskialf.android.wringer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.media.AudioManager;
@@ -17,11 +19,14 @@ import com.hlidskialf.android.preference.SeekBarPreference;
 
 public class SetProfile extends PreferenceActivity implements ProfileModel.ProfileReporter
 {
+  private ContentResolver mResolver;
+  private Uri mContentUri;
+
   private int mId;
   private String mName;
   private int mVolAlarm, mVolMusic, mVolNotify, mVolRinger, mVolSystem, mVolVoice;
-  private int mRingerMode, mRingerVibrate, mNotifyVibrate;
-  private boolean mPlaySoundFx;
+  private int mRingerMode;
+  private boolean mRingerVibrate, mNotifyVibrate, mPlaySoundFx;
   private String mRingtone, mNotifytone;
   private boolean mAirplaneOn, mWifiOn, mGpsOn, mLocationOn, mBluetoothOn, mAutoSyncOn;
   private int mBrightness, mTimeout;
@@ -145,10 +150,12 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+
+    mResolver = getContentResolver();
     
     Intent i = getIntent();
     mId = i.getIntExtra(Wringer.EXTRA_PROFILE_ID, -1);
-    ProfileModel.getProfile(getContentResolver(), this, mId);
+    ProfileModel.getProfile(mResolver, this, mId);
 
     mPrefContacts = findPreference("contacts");
     Intent contacts_intent = new Intent(this, SetProfileContacts.class); 
@@ -163,11 +170,12 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
   public void reportProfile(
       int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
-      int ringer_mode, int ringer_vibrate, int notify_vibrate, boolean play_soundfx,
+      int ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
       String ringtone, String notifytone, 
       boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on, boolean autosync_on, int brightness, int screen_timeout) 
   {
     mId = id;
+    mContentUri = Uri.withAppendedPath(ProfileModel.ProfileColumns.CONTENT_URI, String.valueOf(mId));
     mName = name;
     mVolAlarm = alarm_vol;
     mVolMusic = music_vol;
@@ -191,32 +199,52 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mTimeout = screen_timeout;
   }
 
+  private void update_column(String key, String value)
+  {
+    ContentValues values = new ContentValues(1);
+    values.put(key, value);
+    mResolver.update(mContentUri, values, null, null);
+  }
+  private void update_column(String key, int value)
+  {
+    ContentValues values = new ContentValues(1);
+    values.put(key, value);
+    mResolver.update(mContentUri, values, null, null);
+  }
+
   public void updateName(String name) {
     mPrefName.setSummary(mName = name);
+    update_column(ProfileModel.ProfileColumns.NAME, mName);
   }
   public void updateVolAlarm(int vol) {
     mVolAlarm = vol;
     mPrefVolAlarm.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolAlarm.getMax()));
+    update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolAlarm);
   }
   public void updateVolMusic(int vol) {
     mVolMusic = vol;
     mPrefVolMusic.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolMusic.getMax()));
+    update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolMusic);
   }
   public void updateVolNotify(int vol) {
     mVolNotify = vol;
     mPrefVolNotify.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolNotify.getMax()));
+    update_column(ProfileModel.ProfileColumns.NOTIFY_VOLUME, mVolNotify);
   }
   public void updateVolRinger(int vol) {
     mVolRinger = vol;
     mPrefVolRinger.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolRinger.getMax()));
+    update_column(ProfileModel.ProfileColumns.RINGER_VOLUME, mVolRinger);
   }
   public void updateVolSystem(int vol) {
     mVolSystem = vol;
     mPrefVolSystem.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolSystem.getMax()));
+    update_column(ProfileModel.ProfileColumns.SYSTEM_VOLUME, mVolSystem);
   }
   public void updateVolVoice(int vol) {
     mVolVoice = vol;
     mPrefVolVoice.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolVoice.getMax()));
+    update_column(ProfileModel.ProfileColumns.VOICE_VOLUME, mVolVoice);
   }
   public void updateRingerMode(String mode) {
     if (mode.equals("normal")) { 
@@ -231,24 +259,29 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
       mRingerMode = AudioManager.RINGER_MODE_SILENT; 
       mPrefRingerMode.setSummary(R.string.ringer_mode_silent);
     }
+    update_column(ProfileModel.ProfileColumns.RINGER_MODE, mRingerMode);
   }
   public void updateBrightness(int brightness) {
     mPrefBrightness.setSummary(String.valueOf(mBrightness = brightness) +" / 255");
+    update_column(ProfileModel.ProfileColumns.BRIGHTNESS, mBrightness);
   }
   public void updateTimeout(int timeout) {
     mPrefTimeout.setSummary(String.valueOf(mTimeout = timeout) +" seconds");
+    update_column(ProfileModel.ProfileColumns.SCREEN_TIMEOUT, mTimeout);
   }
   public void updateRingtone(String uri) {
     mRingtone = uri;
     Ringtone tone = RingtoneManager.getRingtone(this, Uri.parse(uri));
     if (tone != null)
       mPrefRingtone.setSummary(tone.getTitle(this));
+    update_column(ProfileModel.ProfileColumns.RINGTONE, mRingtone);
   }
   public void updateNotifytone(String uri) {
     mNotifytone = uri;
     Ringtone tone = RingtoneManager.getRingtone(this, Uri.parse(uri));
     if (tone != null)
       mPrefNotifytone.setSummary(tone.getTitle(this));
+    update_column(ProfileModel.ProfileColumns.NOTIFYTONE, mNotifytone);
   }
 
 }
