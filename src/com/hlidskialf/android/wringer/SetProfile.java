@@ -134,6 +134,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+    /*
     mPrefAutosync = (CheckBoxPreference)findPreference("autosync_on");
     mPrefAutosync.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -141,6 +142,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+    */
     mPrefRingerVibrate = (CheckBoxPreference)findPreference("ringer_vibrate");
     mPrefRingerVibrate.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -176,6 +178,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+    /*
     mPrefGps = (CheckBoxPreference)findPreference("gps_on");
     mPrefGps.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -197,6 +200,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+    */
     mPrefRingtone = (RingtonePreference)findPreference("ringtone");
     mPrefRingtone.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -241,10 +245,12 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     update_notifytone(notifytone, false);
     update_airplane(airplane_on, false); mPrefAirplane.setChecked(airplane_on);
     update_wifi(wifi_on, false); mPrefWifi.setChecked(wifi_on);
+    /*
     update_gps(gps_on, false); mPrefGps.setChecked(gps_on);
     update_location(location_on, false); mPrefLocation.setChecked(location_on);
     update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
     update_autosync(autosync_on, false); mPrefAutosync.setChecked(autosync_on);
+    */
     update_brightness(brightness, false);
     update_timeout(screen_timeout, false);
 

@@ -16,12 +16,14 @@
       android:max="600"
       persistent="false"
       />
+      <!--
     <CheckBoxPreference android:key="autosync_on"
       android:title="@string/autosync_on"
       android:summaryOn="@string/autosync_on_summary_on"
       android:summaryOff="@string/autosync_on_summary_off"
       persistent="false"
       />
+      -->
   </PreferenceCategory>
 
   <PreferenceCategory android:title="@string/profile_prefs_cat_tone">
@@ -107,15 +109,16 @@
       android:summaryOn="@string/airplane_on_summary_on"
       android:summaryOff="@string/airplane_on_summary_off"
       />
+    <CheckBoxPreference android:key="wifi_on"
+      android:title="@string/wifi_on"
+      persistent="false"
+      android:summaryOn="@string/wifi_on_summary_on"
+      android:summaryOff="@string/wifi_on_summary_off"
+      />
+        <!--
     <PreferenceScreen android:title="@string/profile_prefs_cat_radio"
                       android:summary="@string/profile_prefs_cat_radio_summary">
       <PreferenceCategory android:title="@string/profile_prefs_cat_radio"/>
-      <CheckBoxPreference android:key="wifi_on"
-        android:title="@string/wifi_on"
-        persistent="false"
-        android:summaryOn="@string/wifi_on_summary_on"
-        android:summaryOff="@string/wifi_on_summary_off"
-        />
       <CheckBoxPreference android:key="gps_on"
         android:title="@string/gps_on"
         persistent="false"
@@ -135,6 +138,7 @@
         android:summaryOff="@string/bluetooth_on_summary_off"
         />
     </PreferenceScreen>
+        -->
   </PreferenceCategory>
 
 

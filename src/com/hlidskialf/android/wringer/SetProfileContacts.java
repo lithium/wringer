@@ -47,15 +47,16 @@ public class SetProfileContacts extends ListActivity
 
       // cache up the profile photos
       mPhotos = new HashMap<Integer,Bitmap>();
-      cursor.moveToFirst();
-      do {
-        int id = cursor.getInt(mIdIdx);
-        Uri uri = ContentUris.withAppendedId(People.CONTENT_URI, id);
-        Bitmap b = People.loadContactPhoto(context, uri, android.R.drawable.gallery_thumb, null);
-        if (b != null) {
-          mPhotos.put(id, Bitmap.createScaledBitmap(b, 48, 48, true));
-        }
-      } while (cursor.moveToNext());
+      if (cursor.moveToFirst()) {
+        do {
+          int id = cursor.getInt(mIdIdx);
+          Uri uri = ContentUris.withAppendedId(People.CONTENT_URI, id);
+          Bitmap b = People.loadContactPhoto(context, uri, android.R.drawable.gallery_thumb, null);
+          if (b != null) {
+            mPhotos.put(id, Bitmap.createScaledBitmap(b, 48, 48, true));
+          }
+        } while (cursor.moveToNext());
+      }
       cursor.moveToFirst();
 
     }

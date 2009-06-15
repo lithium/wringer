@@ -1,14 +1,20 @@
 package com.hlidskialf.android.wringer;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.content.Context;
-import android.content.ContentResolver;
 import android.net.Uri;
-import android.media.AudioManager;
-import android.provider.Settings;
 import android.net.wifi.WifiManager;
+import android.provider.Contacts.People;
+import android.provider.Settings;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class Wringer
 {
@@ -61,7 +67,12 @@ public class Wringer
       Settings.System.putInt(resolver, Settings.System.SOUND_EFFECTS_ENABLED, play_soundfx ? 1 : 0);
       Settings.System.putString(resolver, Settings.System.RINGTONE, ringtone);
       Settings.System.putString(resolver, Settings.System.NOTIFICATION_SOUND, notifytone);
+
       Settings.System.putInt(resolver, Settings.System.AIRPLANE_MODE_ON, airplane_on ? 1 : 0);
+      Intent i = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+      i.putExtra("state", airplane_on);
+      mContext.sendBroadcast(i);
+
       Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
       Settings.System.putInt(resolver, Settings.System.SCREEN_OFF_TIMEOUT, screen_timeout);
 
@@ -70,25 +81,26 @@ public class Wringer
 
       //gps - secured
       //location - secured
+      //autosync - secured
+      //bluetooth - secured
 
-      try {
-        Object bm = mContext.getSystemService("bluetooth");
-        if (bm == null) 
-          android.util.Log.v("Wringer", "no bluetooth service");
-        Class<?> cls = bm.getClass();
-        Method method = cls.getMethod(bluetooth_on ? "enable" : "disable");
-        if (method != null) {
-          method.setAccessible(true);
-          method.invoke(bm);
-        }
-        else
-          android.util.Log.v("Wringer", "no bluetooth method");
-      } catch (java.lang.Exception e) {
-        android.util.Log.v("Wringer", "failed to reflect bluetooth service" + e); 
+      //iterate over all contacts and update their ringtones
+      HashMap<Integer,Uri> ringtones = ProfileModel.getAllContactRingtones(resolver, id);
+      Cursor people = resolver.query(People.CONTENT_URI, 
+        new String[] {People._ID}, null,null,null);
+      if (people.moveToFirst()) {
+        do {
+          int contact_id = people.getInt(0);  
+          Uri contact_ringtone = ringtones.get(contact_id);
+          ContentValues values = new ContentValues(1);
+          values.put(People.CUSTOM_RINGTONE, 
+            contact_ringtone == null ?  "" : contact_ringtone.toString());
+          resolver.update(
+            Uri.withAppendedPath(People.CONTENT_URI, String.valueOf(contact_id)),
+            values, null,null
+          );
+        } while (people.moveToNext());
       }
-
-      //autosync
-
     }
   }
 
