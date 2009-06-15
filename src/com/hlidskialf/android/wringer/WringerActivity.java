@@ -170,5 +170,7 @@ public class WringerActivity extends ListActivity
   {
     mCurProfile = pos;
     getListView().invalidateViews();
+
+    Wringer.applyProfile(this,  (int)mListAdapter.getItemId(pos));
   }
 }
