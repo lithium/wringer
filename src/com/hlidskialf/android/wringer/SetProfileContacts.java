@@ -28,6 +28,7 @@ public class SetProfileContacts extends ListActivity
 
   private Cursor mPeopleCursor;
   private long mPickingId;
+  private View mPickingView;
   private ProfileContactsAdapter mListAdapter;
   private int mProfileId;
   private HashMap<Integer,Uri> mRingtones;
@@ -98,15 +99,7 @@ public class SetProfileContacts extends ListActivity
     //fetch the existing ringtones for this profile
     mRingtones = ProfileModel.getAllContactRingtones(getContentResolver(), mProfileId);
 
-    Button b;
-    b = (Button)findViewById(android.R.id.button1);
-    b.setOnClickListener(new Button.OnClickListener() {
-      public void onClick(View v) {
-        finish();
-      }
-    });
-
-    b = (Button)findViewById(android.R.id.button2);
+    Button b = (Button)findViewById(android.R.id.button1);
     b.setOnClickListener(new Button.OnClickListener() {
       public void onClick(View v) {
         finish();
@@ -126,6 +119,7 @@ public class SetProfileContacts extends ListActivity
   protected void onListItemClick(ListView lv, View v, int pos, long id)
   {
     mPickingId = mListAdapter.getItemId(pos);
+    mPickingView = v;
     Intent picker = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
     startActivityForResult(picker, REQUEST_RINGTONE);
   }
@@ -145,8 +139,12 @@ public class SetProfileContacts extends ListActivity
       getContentResolver().insert(ProfileModel.ProfileContactColumns.CONTENT_URI, values);
       mRingtones.put((int)mPickingId, uri);
 
+      TextView tv = (TextView)mPickingView.findViewById(android.R.id.text2);
+      tv.setText( Wringer.getRingtoneTitle(this, uri) ); 
+
       android.util.Log.v("picked", String.valueOf(mPickingId)+": "+uri.toString());
       mPickingId = -1;
+      mPickingView = null;
     }
   }
 

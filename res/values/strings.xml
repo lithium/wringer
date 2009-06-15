@@ -3,8 +3,6 @@
     <string name="app_name">WringerActivity</string>
 
 
-
-
     <string name="profile_prefs_cat">Profile Settings</string>
     <string name="name">Profile Name</string>
     <string name="brightness">Screen Brightness</string>
