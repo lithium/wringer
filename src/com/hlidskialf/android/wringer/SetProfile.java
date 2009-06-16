@@ -193,6 +193,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
+    */
     mPrefBluetooth = (CheckBoxPreference)findPreference("bluetooth_on");
     mPrefBluetooth.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -200,7 +201,6 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
         return true;
       }
     });
-    */
     mPrefRingtone = (RingtonePreference)findPreference("ringtone");
     mPrefRingtone.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -247,10 +247,10 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     update_wifi(wifi_on, false); mPrefWifi.setChecked(wifi_on);
     update_brightness(brightness, false);
     update_timeout(screen_timeout, false);
+    update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
     /*
     update_gps(gps_on, false); mPrefGps.setChecked(gps_on);
     update_location(location_on, false); mPrefLocation.setChecked(location_on);
-    update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
     update_autosync(autosync_on, false); mPrefAutosync.setChecked(autosync_on);
     */
 

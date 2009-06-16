@@ -8,7 +8,8 @@ import android.view.View;
 import android.widget.ListView;
 
 public class ProfileChooser extends ListActivity
-                            implements Wringer.ProfileAdapter.OnChooseProfileListener
+                            implements Wringer.ProfileAdapter.OnChooseProfileListener,
+                                       Wringer.OnProfileAppliedListener
 {
   private SharedPreferences mPrefs;
   private Wringer.ProfileAdapter mListAdapter;
@@ -29,14 +30,16 @@ public class ProfileChooser extends ListActivity
   }
 
   public void onChooseProfile(int pos, long profile_id) {
-    Wringer.applyProfile(this, (int)profile_id, getWindow());
-    finish();
+    Wringer.applyProfile(this, (int)profile_id, getWindow(), this);
   }
 
   @Override
   protected void onListItemClick(ListView lv, View v, int pos, long id)
   {
-    Wringer.applyProfile(this, (int)id, getWindow());
+    Wringer.applyProfile(this, (int)id, getWindow(), this);
+  }
+
+  public void onProfileApplied(int profile_id) {
     finish();
   }
 }

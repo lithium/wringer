@@ -1,5 +1,6 @@
 package com.hlidskialf.android.wringer;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +12,8 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Contacts.People;
 import android.provider.Settings;
 import java.lang.reflect.Method;
@@ -30,6 +33,8 @@ import android.text.TextUtils;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+
+import java.lang.reflect.Method;
 
 public class Wringer
 {
@@ -61,30 +66,95 @@ public class Wringer
     return r.getTitle(context);
   }
 
-  public static void applyProfile(Context context, int profile_id, Window window)
+
+
+
+  public static void applyProfile(Context context, int profile_id, Window window, OnProfileAppliedListener listener)
   {
-    ProfileModel.getProfile(context.getContentResolver(), new Wringer.ProfileApplier(context, window), profile_id);
-
-    // save profile_id in prefs
-    SharedPreferences prefs = context.getSharedPreferences(Wringer.PREFERENCES, 0);
-    prefs.edit().putInt(Wringer.PREF_CUR_PROFILE, profile_id).commit();
-
-    // update any widgets
-    AppWidgetManager awm = AppWidgetManager.getInstance(context);
-    int[] widget_ids = awm.getAppWidgetIds(new ComponentName(context, WringerWidgetProvider.class));
-    Intent intent = new Intent(context, WringerWidgetProvider.class);
-    intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widget_ids);
-    context.sendBroadcast(intent);
+    ProfileApplierHandler handler = new ProfileApplierHandler(context, window, listener);
+    ProfileApplier thread = new ProfileApplier(context, profile_id, handler);
+    thread.start();
   }
-  private static class ProfileApplier implements ProfileModel.ProfileReporter 
+  public interface OnProfileAppliedListener {
+    public void onProfileApplied(int profile_id);
+  }
+  private static class ProfileApplierHandler extends Handler
   {
-    private Context mContext;
+    public static final int WHAT_BRIGHTNESS=1;
+    public static final int WHAT_START_PROGRESS=2;
+    public static final int WHAT_DONE=4;
+
     private Window mWindow;
-    public ProfileApplier(Context context, Window window) {
+    private Context mContext;
+    private ProgressDialog mDialog;
+    private OnProfileAppliedListener mListener;
+    public ProfileApplierHandler(Context context, Window window, Wringer.OnProfileAppliedListener listener)
+    {
       mContext = context;
       mWindow = window;
+      mListener = listener;
     }
+    @Override
+    public void handleMessage(Message msg) {
+      switch(msg.what) {
+        case WHAT_BRIGHTNESS:
+          if (mWindow != null) {
+            int brightness = msg.arg1;
+            WindowManager.LayoutParams params = mWindow.getAttributes();
+            params.screenBrightness = Math.max(0.1f, (float)brightness / 255.0f);
+            mWindow.setAttributes(params);
+          }
+          break;
+        case WHAT_START_PROGRESS:
+          if (mDialog == null)
+            mDialog = ProgressDialog.show(mContext, "Wringer", "Applying profile...", true, false);
+          break;
+        case WHAT_DONE:
+          if (mDialog != null)
+            mDialog.dismiss();
+          if (mListener != null) {
+            mListener.onProfileApplied(msg.arg1);
+          }
+          break;
+      }
+    }
+  }
+  private static class ProfileApplier extends Thread implements ProfileModel.ProfileReporter 
+  {
+    private Context mContext;
+    private Handler mHandler;
+    private int mProfileId;
+    private ContentResolver mResolver;
+    public ProfileApplier(Context context, int profile_id, Handler handler)
+    {
+      mContext = context;
+      mProfileId = profile_id;
+      mHandler = handler;
+      mResolver = mContext.getContentResolver();
+    }
+
+    public void run() {
+      Message msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_START_PROGRESS);
+      msg.sendToTarget();
+
+      ProfileModel.getProfile(mResolver, this, mProfileId);
+
+      // save profile_id in prefs
+      SharedPreferences prefs = mContext.getSharedPreferences(Wringer.PREFERENCES, 0);
+      prefs.edit().putInt(Wringer.PREF_CUR_PROFILE, mProfileId).commit();
+
+      // update any widgets
+      AppWidgetManager awm = AppWidgetManager.getInstance(mContext);
+      int[] widget_ids = awm.getAppWidgetIds(new ComponentName(mContext, WringerWidgetProvider.class));
+      Intent intent = new Intent(mContext, WringerWidgetProvider.class);
+      intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+      intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widget_ids);
+      mContext.sendBroadcast(intent);
+
+      msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_DONE, mProfileId, 0);
+      msg.sendToTarget();
+    }
+
     public void reportProfile(int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
       String ringer_mode, boolean ringer_vibrate, boolean notify_vibrate, boolean play_soundfx,
@@ -110,35 +180,29 @@ public class Wringer
       am.setVibrateSetting(AudioManager.VIBRATE_TYPE_NOTIFICATION, 
         notify_vibrate ? AudioManager.VIBRATE_SETTING_ON : AudioManager.VIBRATE_SETTING_OFF);
 
-      ContentResolver resolver = mContext.getContentResolver();
-      Settings.System.putInt(resolver, Settings.System.SOUND_EFFECTS_ENABLED, play_soundfx ? 1 : 0);
-      Settings.System.putString(resolver, Settings.System.RINGTONE, ringtone);
-      Settings.System.putString(resolver, Settings.System.NOTIFICATION_SOUND, notifytone);
-      Settings.System.putInt(resolver, Settings.System.SCREEN_OFF_TIMEOUT, screen_timeout*1000);
-      Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
+      Settings.System.putInt(mResolver, Settings.System.SOUND_EFFECTS_ENABLED, play_soundfx ? 1 : 0);
+      Settings.System.putString(mResolver, Settings.System.RINGTONE, ringtone);
+      Settings.System.putString(mResolver, Settings.System.NOTIFICATION_SOUND, notifytone);
+      Settings.System.putInt(mResolver, Settings.System.SCREEN_OFF_TIMEOUT, screen_timeout*1000);
+      Settings.System.putInt(mResolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
+      
       //apply brightness immediately
-      if (mWindow != null) {
-        WindowManager.LayoutParams params = mWindow.getAttributes();
-        params.screenBrightness = Math.max(0.1f, (float)brightness / 255.0f);
-        mWindow.setAttributes(params);
-      }
-
-      Settings.System.putInt(resolver, Settings.System.AIRPLANE_MODE_ON, airplane_on ? 1 : 0);
+      Message msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_BRIGHTNESS, brightness, 0);
+      msg.sendToTarget();
+  
+      Settings.System.putInt(mResolver, Settings.System.AIRPLANE_MODE_ON, airplane_on ? 1 : 0);
+      //broadcast airplane intent
       Intent i = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
       i.putExtra("state", airplane_on);
       mContext.sendBroadcast(i);
 
-      WifiManager wm = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-      wm.setWifiEnabled(wifi_on);
-
       //gps - secured
       //location - secured
       //autosync - secured
-      //bluetooth - secured
 
       //iterate over all contacts and update their ringtones
-      HashMap<Integer,Uri> ringtones = ProfileModel.getAllContactRingtones(resolver, id);
-      Cursor people = resolver.query(People.CONTENT_URI, 
+      HashMap<Integer,Uri> ringtones = ProfileModel.getAllContactRingtones(mResolver, mProfileId);
+      Cursor people = mResolver.query(People.CONTENT_URI, 
         new String[] {People._ID}, 
         People.PRIMARY_PHONE_ID+" IS NOT NULL",null,null);
       if (people != null && people.moveToFirst()) {
@@ -148,12 +212,37 @@ public class Wringer
           ContentValues values = new ContentValues(1);
           values.put(People.CUSTOM_RINGTONE, 
             contact_ringtone == null ?  "" : contact_ringtone.toString());
-          resolver.update(
+          mResolver.update(
             Uri.withAppendedPath(People.CONTENT_URI, String.valueOf(contact_id)),
             values, null,null
           );
         } while (people.moveToNext());
       }
+
+      //wifi
+      WifiManager wm = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+      wm.setWifiEnabled(wifi_on);
+
+      //bluetooth
+      Object obj = mContext.getSystemService("bluetooth");
+      if (obj != null) {
+        Class<?> cls = obj.getClass();
+        try { 
+          Method meth = cls.getMethod(bluetooth_on ? "enable" : "disable");
+          if (meth != null) {
+            meth.setAccessible(true);
+            meth.invoke(obj,new Object[]{});
+          } 
+          else 
+            android.util.Log.v("Wringer", "no bluetooth method");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            android.util.Log.v("Wringer", "invocation target error: "+e.getTargetException());
+        } catch (java.lang.Exception e) {
+            android.util.Log.v("Wringer", "reflection error: "+e);
+        }
+      }
+      else
+        android.util.Log.v("Wringer", "no bluetooth for you!");
     }
   }
 

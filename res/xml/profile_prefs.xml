@@ -117,6 +117,12 @@
       android:summaryOn="@string/wifi_on_summary_on"
       android:summaryOff="@string/wifi_on_summary_off"
       />
+    <CheckBoxPreference android:key="bluetooth_on"
+      android:title="@string/bluetooth_on"
+      android:persistent="false"
+      android:summaryOn="@string/bluetooth_on_summary_on"
+      android:summaryOff="@string/bluetooth_on_summary_off"
+      />
         <!--
     <PreferenceScreen android:title="@string/profile_prefs_cat_radio"
                       android:summary="@string/profile_prefs_cat_radio_summary">
@@ -132,12 +138,6 @@
         android:persistent="false"
         android:summaryOn="@string/location_on_summary_on"
         android:summaryOff="@string/location_on_summary_off"
-        />
-      <CheckBoxPreference android:key="bluetooth_on"
-        android:title="@string/bluetooth_on"
-        android:persistent="false"
-        android:summaryOn="@string/bluetooth_on_summary_on"
-        android:summaryOff="@string/bluetooth_on_summary_off"
         />
     </PreferenceScreen>
         -->

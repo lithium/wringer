@@ -46,7 +46,7 @@ public class WringerActivity extends ListActivity
       public void onChooseProfile(int pos, long profile_id) {
         getListView().invalidateViews();
 
-        Wringer.applyProfile(WringerActivity.this, (int)profile_id, getWindow());
+        Wringer.applyProfile(WringerActivity.this, (int)profile_id, getWindow(), null);
       }
     });
     setListAdapter(mListAdapter);
