@@ -2,11 +2,13 @@ package com.hlidskialf.android.wringer;
 
 import android.provider.BaseColumns;
 import android.content.ContentValues;
+import android.content.Context;
 import android.net.Uri;
 import android.content.ContentResolver;
 import java.util.HashMap;
 import java.util.List;
 import android.database.Cursor;
+import android.media.AudioManager;
 
 public class ProfileModel
 {
@@ -93,9 +95,19 @@ public class ProfileModel
     );
   }
 
-  public static int newProfile(ContentResolver resolver)
+  public static int newProfile(Context context)
   {
-    Uri new_uri = resolver.insert(ProfileModel.ProfileColumns.CONTENT_URI, new ContentValues());
+    AudioManager audio_mgr = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+    ContentValues values = new ContentValues();
+
+    values.put(ProfileColumns.ALARM_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_ALARM));
+    values.put(ProfileColumns.MUSIC_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
+    values.put(ProfileColumns.NOTIFY_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_NOTIFICATION));
+    values.put(ProfileColumns.RINGER_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_RING));
+    values.put(ProfileColumns.SYSTEM_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_SYSTEM));
+    values.put(ProfileColumns.VOICE_VOLUME, audio_mgr.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+
+    Uri new_uri = context.getContentResolver().insert(ProfileModel.ProfileColumns.CONTENT_URI, values);
     List<String> segments = new_uri.getPathSegments();
     return Integer.valueOf( segments.get(1) );
   }

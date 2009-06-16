@@ -22,6 +22,8 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 import android.text.TextUtils;
@@ -52,11 +54,6 @@ public class Wringer
     cursor.close();
     return ret;
   }
-  public static void setCurProfile(Context context, int profile_id)
-  {
-    SharedPreferences prefs = context.getSharedPreferences(Wringer.PREFERENCES, 0);
-    prefs.edit().putInt(Wringer.PREF_CUR_PROFILE, profile_id).commit();
-  }
 
   public static String getRingtoneTitle(Context context, Uri uri)
   {
@@ -64,10 +61,15 @@ public class Wringer
     return r.getTitle(context);
   }
 
-  public static void applyProfile(Context context, int profile_id)
+  public static void applyProfile(Context context, int profile_id, Window window)
   {
-    ProfileModel.getProfile(context.getContentResolver(), new Wringer.ProfileApplier(context), profile_id);
+    ProfileModel.getProfile(context.getContentResolver(), new Wringer.ProfileApplier(context, window), profile_id);
 
+    // save profile_id in prefs
+    SharedPreferences prefs = context.getSharedPreferences(Wringer.PREFERENCES, 0);
+    prefs.edit().putInt(Wringer.PREF_CUR_PROFILE, profile_id).commit();
+
+    // update any widgets
     AppWidgetManager awm = AppWidgetManager.getInstance(context);
     int[] widget_ids = awm.getAppWidgetIds(new ComponentName(context, WringerWidgetProvider.class));
     Intent intent = new Intent(context, WringerWidgetProvider.class);
@@ -78,8 +80,10 @@ public class Wringer
   private static class ProfileApplier implements ProfileModel.ProfileReporter 
   {
     private Context mContext;
-    public ProfileApplier(Context context) {
+    private Window mWindow;
+    public ProfileApplier(Context context, Window window) {
       mContext = context;
+      mWindow = window;
     }
     public void reportProfile(int id, String name, 
       int alarm_vol, int music_vol, int notify_vol, int ringer_vol, int system_vol, int voice_vol,
@@ -110,9 +114,14 @@ public class Wringer
       Settings.System.putInt(resolver, Settings.System.SOUND_EFFECTS_ENABLED, play_soundfx ? 1 : 0);
       Settings.System.putString(resolver, Settings.System.RINGTONE, ringtone);
       Settings.System.putString(resolver, Settings.System.NOTIFICATION_SOUND, notifytone);
+      Settings.System.putInt(resolver, Settings.System.SCREEN_OFF_TIMEOUT, screen_timeout*1000);
       Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
-      Settings.System.putInt(resolver, Settings.System.SCREEN_OFF_TIMEOUT, screen_timeout);
-
+      //apply brightness immediately
+      if (mWindow != null) {
+        WindowManager.LayoutParams params = mWindow.getAttributes();
+        params.screenBrightness = Math.max(0.1f, (float)brightness / 255.0f);
+        mWindow.setAttributes(params);
+      }
 
       Settings.System.putInt(resolver, Settings.System.AIRPLANE_MODE_ON, airplane_on ? 1 : 0);
       Intent i = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
@@ -146,6 +155,21 @@ public class Wringer
         } while (people.moveToNext());
       }
     }
+  }
+
+  public static Cursor getProfileCursor(ContentResolver resolver)
+  {
+    Cursor c = resolver.query(ProfileModel.ProfileColumns.CONTENT_URI,
+      new String[] {ProfileModel.ProfileColumns._ID, 
+        ProfileModel.ProfileColumns.NAME,
+        ProfileModel.ProfileColumns.RINGER_MODE,
+        ProfileModel.ProfileColumns.AIRPLANE_ON,
+        ProfileModel.ProfileColumns.WIFI_ON,
+        ProfileModel.ProfileColumns.GPS_ON,
+        ProfileModel.ProfileColumns.LOCATION_ON,
+        ProfileModel.ProfileColumns.BLUETOOTH_ON,
+        ProfileModel.ProfileColumns.AUTOSYNC_ON}, null,null,null);
+    return c;
   }
 
   public static class ProfileAdapter extends CursorAdapter 
@@ -183,13 +207,14 @@ public class Wringer
         tv.setText(name);
 
       final int pos = cursor.getPosition();
+      final int id = (int)getItemId(pos);
       CheckBox cb = (CheckBox)v.findViewById(android.R.id.checkbox);
-      cb.setChecked(mCurProfile == pos);
+      cb.setChecked(mCurProfile == id);
       cb.setOnClickListener(new Button.OnClickListener() {
         public void onClick(View v) {
-          mCurProfile = pos;
+          mCurProfile = id;
           if (mListener != null) {
-            mListener.onChooseProfile(pos, getItemId(pos));
+            mListener.onChooseProfile(pos, id);
           }
         }
       });
@@ -249,9 +274,8 @@ public class Wringer
       return v;
     }
 
-    public void setCurProfile(int pos) { 
-      if (pos > 0 && pos < getCount())
-        mCurProfile = pos; 
+    public void setCurProfile(int profile_id) { 
+      mCurProfile = profile_id;
     }
     public void setOnChooseProfileListener(OnChooseProfileListener listener) { 
       mListener = listener; 

@@ -38,16 +38,7 @@ public class WringerActivity extends ListActivity
     mPrefs = getSharedPreferences(Wringer.PREFERENCES, 0);
     int cur_profile = mPrefs.getInt(Wringer.PREF_CUR_PROFILE, -1);
 
-    Cursor c = mResolver.query(ProfileModel.ProfileColumns.CONTENT_URI,
-      new String[] {ProfileModel.ProfileColumns._ID, 
-        ProfileModel.ProfileColumns.NAME,
-        ProfileModel.ProfileColumns.RINGER_MODE,
-        ProfileModel.ProfileColumns.AIRPLANE_ON,
-        ProfileModel.ProfileColumns.WIFI_ON,
-        ProfileModel.ProfileColumns.GPS_ON,
-        ProfileModel.ProfileColumns.LOCATION_ON,
-        ProfileModel.ProfileColumns.BLUETOOTH_ON,
-        ProfileModel.ProfileColumns.AUTOSYNC_ON}, null,null,null);
+    Cursor c = Wringer.getProfileCursor(mResolver);
     startManagingCursor(c);
     mListAdapter = new Wringer.ProfileAdapter(this, c);
     mListAdapter.setCurProfile(cur_profile);
@@ -55,8 +46,7 @@ public class WringerActivity extends ListActivity
       public void onChooseProfile(int pos, long profile_id) {
         getListView().invalidateViews();
 
-        Wringer.applyProfile(WringerActivity.this, (int)profile_id);
-        Wringer.setCurProfile(WringerActivity.this, (int)profile_id);
+        Wringer.applyProfile(WringerActivity.this, (int)profile_id, getWindow());
       }
     });
     setListAdapter(mListAdapter);
@@ -64,7 +54,7 @@ public class WringerActivity extends ListActivity
     Button b = (Button)findViewById(android.R.id.button1);
     b.setOnClickListener(new Button.OnClickListener() {
       public void onClick(View v) {
-        int profile_id = ProfileModel.newProfile(mResolver);  
+        int profile_id = ProfileModel.newProfile(WringerActivity.this);  
         edit_profile(profile_id);
       }
     });
