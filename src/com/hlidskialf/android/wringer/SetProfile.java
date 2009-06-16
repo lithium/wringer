@@ -245,14 +245,14 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     update_notifytone(notifytone, false);
     update_airplane(airplane_on, false); mPrefAirplane.setChecked(airplane_on);
     update_wifi(wifi_on, false); mPrefWifi.setChecked(wifi_on);
+    update_brightness(brightness, false);
+    update_timeout(screen_timeout, false);
     /*
     update_gps(gps_on, false); mPrefGps.setChecked(gps_on);
     update_location(location_on, false); mPrefLocation.setChecked(location_on);
     update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
     update_autosync(autosync_on, false); mPrefAutosync.setChecked(autosync_on);
     */
-    update_brightness(brightness, false);
-    update_timeout(screen_timeout, false);
 
     mContactsIntent = new Intent(this, SetProfileContacts.class); 
     mContactsIntent.putExtra(Wringer.EXTRA_PROFILE_ID, mId);

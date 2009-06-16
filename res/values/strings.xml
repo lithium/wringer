@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">WringerActivity</string>
+    <string name="app_name">Sound Wringer</string>
+    <string name="profilechooser_label">Choose Wringer Profile</string>
 
 
     <string name="profile_prefs_cat">Profile Settings</string>

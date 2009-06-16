@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -23,105 +24,10 @@ public class WringerActivity extends ListActivity
 {
   public static final int REQUEST_SET_PROFILE=1;
 
-  private ProfileAdapter mListAdapter;
+  private Wringer.ProfileAdapter mListAdapter;
   private ContentResolver mResolver;
-  private int mCurProfile = -1;
-
-  private class ProfileAdapter extends CursorAdapter 
-  {
-    private LayoutInflater mFactory;
-    private int mNameIdx, mModeIdx, mAirplaneIdx, mWifiIdx, mGpsIdx, mLocationIdx, mBluetoothIdx, mAutosyncIdx;
-
-    public ProfileAdapter(Context context, Cursor cursor) {
-      super(context,cursor);
-      mFactory = LayoutInflater.from(context);
-
-      mNameIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.NAME);
-      mModeIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.RINGER_MODE);
-      mAirplaneIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.AIRPLANE_ON);
-      mWifiIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.WIFI_ON);
-      mGpsIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.GPS_ON);
-      mLocationIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.LOCATION_ON);
-      mBluetoothIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.BLUETOOTH_ON);
-      mAutosyncIdx = cursor.getColumnIndexOrThrow(ProfileModel.ProfileColumns.AUTOSYNC_ON);
-    }
-
-    @Override
-    public void bindView(View v, Context context, Cursor cursor) {
-      TextView tv = (TextView)v.findViewById(android.R.id.text1);
-      String name = cursor.getString(mNameIdx);
-      if (TextUtils.isEmpty(name))
-        tv.setText(android.R.string.unknownName);
-      else
-        tv.setText(name);
-
-      final int pos = cursor.getPosition();
-      CheckBox cb = (CheckBox)v.findViewById(android.R.id.checkbox);
-      cb.setChecked(mCurProfile == pos);
-      cb.setOnClickListener(new Button.OnClickListener() {
-        public void onClick(View v) {
-          choose_profile(pos);
-        }
-      });
-
-      ImageView iv; 
-      ViewGroup bar = (ViewGroup)v.findViewById(R.id.icon_bar);
-      bar.removeAllViews();
-
-      String ringer_mode = cursor.getString(mModeIdx);
-      if (ringer_mode == null || ringer_mode.equals("normal")) {
-      }
-      else if (ringer_mode.equals("vibrate")) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_ringer_vibrate);
-        bar.addView(iv);
-      }
-      else if (ringer_mode.equals("silent")) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_ringer_silent);
-        bar.addView(iv);
-      }
-      int airplane_on = cursor.getInt(mAirplaneIdx);
-      if (airplane_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_signal_flightmode);
-        bar.addView(iv);
-      }
-      int wifi_on = cursor.getInt(mWifiIdx);
-      if (wifi_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_wifi_signal_4);
-        bar.addView(iv);
-      }
-      int gps_on = cursor.getInt(mGpsIdx);
-      if (gps_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_gps_on);
-        bar.addView(iv);
-      }
-      int bluetooth_on = cursor.getInt(mBluetoothIdx);
-      if (bluetooth_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_data_bluetooth);
-        bar.addView(iv);
-      }
-      int autosync_on = cursor.getInt(mAutosyncIdx);
-      if (autosync_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_notify_sync);
-        bar.addView(iv);
-      }
-
-
-    }
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-      View v = mFactory.inflate(R.layout.profile_list_item, parent, false);
-      bindView(v,context,cursor);
-      return v;
-    }
-  }
-
+  private SharedPreferences mPrefs;
+    
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
@@ -129,6 +35,8 @@ public class WringerActivity extends ListActivity
     setContentView(R.layout.main);
     
     mResolver = getContentResolver();
+    mPrefs = getSharedPreferences(Wringer.PREFERENCES, 0);
+    int cur_profile = mPrefs.getInt(Wringer.PREF_CUR_PROFILE, -1);
 
     Cursor c = mResolver.query(ProfileModel.ProfileColumns.CONTENT_URI,
       new String[] {ProfileModel.ProfileColumns._ID, 
@@ -141,7 +49,16 @@ public class WringerActivity extends ListActivity
         ProfileModel.ProfileColumns.BLUETOOTH_ON,
         ProfileModel.ProfileColumns.AUTOSYNC_ON}, null,null,null);
     startManagingCursor(c);
-    mListAdapter = new ProfileAdapter(this, c);
+    mListAdapter = new Wringer.ProfileAdapter(this, c);
+    mListAdapter.setCurProfile(cur_profile);
+    mListAdapter.setOnChooseProfileListener(new Wringer.ProfileAdapter.OnChooseProfileListener() {
+      public void onChooseProfile(int pos, long profile_id) {
+        getListView().invalidateViews();
+
+        Wringer.applyProfile(WringerActivity.this, (int)profile_id);
+        Wringer.setCurProfile(WringerActivity.this, (int)profile_id);
+      }
+    });
     setListAdapter(mListAdapter);
 
     Button b = (Button)findViewById(android.R.id.button1);
@@ -159,6 +76,16 @@ public class WringerActivity extends ListActivity
     edit_profile((int)id);
   }
 
+  @Override
+  protected void onActivityResult(int request, int result, Intent data)
+  {
+    if (request == REQUEST_SET_PROFILE) {
+      if (mListAdapter.getCount() == 1) {
+        choose_profile(0);
+      }
+    }
+  }
+
   private void edit_profile(int profile_id)
   {
     Intent intent = new Intent(this, SetProfile.class);
@@ -168,9 +95,5 @@ public class WringerActivity extends ListActivity
 
   private void choose_profile(int pos)
   {
-    mCurProfile = pos;
-    getListView().invalidateViews();
-
-    Wringer.applyProfile(this,  (int)mListAdapter.getItemId(pos));
   }
 }

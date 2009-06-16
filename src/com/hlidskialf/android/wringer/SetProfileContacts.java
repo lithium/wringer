@@ -69,9 +69,13 @@ public class SetProfileContacts extends ListActivity
       tv = (TextView)v.findViewById(android.R.id.text1);
       tv.setText( name );
 
+      ImageView iv = (ImageView)v.findViewById(android.R.id.icon);
       if (mPhotos.containsKey(id)) {
-        ImageView iv = (ImageView)v.findViewById(android.R.id.icon);
+        iv.setVisibility(View.VISIBLE);
         iv.setImageBitmap(mPhotos.get(id));
+      }
+      else {
+        iv.setVisibility(View.INVISIBLE);
       }
 
       if (mRingtones.containsKey(id)) {
@@ -109,7 +113,7 @@ public class SetProfileContacts extends ListActivity
 
     mPeopleCursor = getContentResolver().query(People.CONTENT_URI, 
       new String[] {People._ID, People.NAME}, 
-      null,null,null);
+      People.PRIMARY_PHONE_ID+" IS NOT NULL",null,null);
     startManagingCursor(mPeopleCursor);
     mListAdapter = new ProfileContactsAdapter(this, mPeopleCursor);
     setListAdapter(mListAdapter);
