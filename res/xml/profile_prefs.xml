@@ -7,6 +7,7 @@
       android:persistent="false"
       android:singleLine="true"
       android:selectAllOnFocus="true"
+      android:capitalize="sentences"
       />
       <!--
     <CheckBoxPreference android:key="autosync_on"

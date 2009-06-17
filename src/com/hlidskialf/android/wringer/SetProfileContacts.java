@@ -94,6 +94,12 @@ public class SetProfileContacts extends ListActivity
         else
           tv.setText( R.string.notifytone );
       }
+      else {
+        tv = (TextView)v.findViewById(R.id.ringtone_text);
+        tv.setText( R.string.ringtone );
+        tv = (TextView)v.findViewById(R.id.notifytone_text);
+        tv.setText( R.string.notifytone );
+      }
 
     }
     @Override
@@ -169,6 +175,7 @@ public class SetProfileContacts extends ListActivity
   {
     if (result != RESULT_OK) return;
     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+    String tone = uri == null ? "" : uri.toString();
     ContentValues values = new ContentValues(3);
 
     values.put(ProfileModel.ProfileContactColumns.PROFILE_ID, mProfileId);
@@ -180,12 +187,12 @@ public class SetProfileContacts extends ListActivity
 
     TextView tv = null;
     if (request == REQUEST_RINGTONE) {
-      values.put(ProfileModel.ProfileContactColumns.RINGTONE, uri.toString());
+      values.put(ProfileModel.ProfileContactColumns.RINGTONE, tone);
       tv = (TextView)mPickingView.findViewById(R.id.ringtone_text);
       uris[0] = uri;
     }
     else if (request == REQUEST_NOTIFYTONE) {
-      values.put(ProfileModel.ProfileContactColumns.NOTIFYTONE, uri.toString());
+      values.put(ProfileModel.ProfileContactColumns.NOTIFYTONE, tone);
       tv = (TextView)mPickingView.findViewById(R.id.notifytone_text);
       uris[1] = uri;
     }
