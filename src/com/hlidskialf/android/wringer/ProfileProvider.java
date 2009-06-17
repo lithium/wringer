@@ -128,13 +128,21 @@ public class ProfileProvider extends ContentProvider {
 
   @Override
   public int update(Uri uri, ContentValues values, String where, String[] where_args) {
-    if (sUriMatcher.match(uri) != URI_MATCH_PROFILE_ID)
+    String table = null;
+
+    if (sUriMatcher.match(uri) == URI_MATCH_PROFILE_ID) {
+      table = ProfileModel.ProfileColumns.TABLE_NAME;
+    }
+    else if (sUriMatcher.match(uri) == URI_MATCH_PROFILE_CONTACT_ID) {
+      table = ProfileModel.ProfileContactColumns.TABLE_NAME;
+    }
+    else 
       throw new UnsupportedOperationException("Cannot update URI: " + uri);
 
     SQLiteDatabase db = mOpenHelper.getWritableDatabase();
     String segment = uri.getPathSegments().get(1);
     long id = Long.parseLong(segment);
-    int count = db.update(ProfileModel.ProfileColumns.TABLE_NAME, values, "_id="+id, null);
+    int count = db.update(table, values, "_id="+id, null);
  
     getContext().getContentResolver().notifyChange(uri, null);
     return count;

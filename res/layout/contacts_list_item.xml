@@ -9,6 +9,7 @@
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
     android:padding="6dp"
+    android:layout_marginTop="7dp"
     />
   <TextView android:id="@android:id/text1"
     android:layout_width="wrap_content"
@@ -17,12 +18,47 @@
     android:layout_alignParentTop="true"
     android:textAppearance="?android:attr/textAppearanceLarge"
     />
-  <TextView android:id="@android:id/text2"
-    android:layout_width="wrap_content"
+
+  <LinearLayout android:id="@+id/ringtone_row"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_toRightOf="@android:id/icon"
     android:layout_below="@android:id/text1"
-    android:layout_alignParentBottom="true"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    />
+    android:layout_toRightOf="@android:id/icon"
+    android:orientation="horizontal"
+    >
+    <ImageView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/ic_incall_ongoing"
+      android:layout_marginLeft="1dp"
+      />
+    <TextView android:id="@+id/ringtone_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:layout_marginLeft="4dp"
+      android:text="@string/ringtone"
+      />
+  </LinearLayout>
+
+  <LinearLayout android:id="@+id/notifytone_row"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/ringtone_row"
+    android:layout_toRightOf="@android:id/icon"
+    android:orientation="horizontal"
+    >
+    <ImageView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/stat_notify_mms"
+      />
+    <TextView android:id="@+id/notifytone_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:layout_marginLeft="4dp"
+      android:text="@string/notifytone"
+      />
+  </LinearLayout>
 </RelativeLayout>

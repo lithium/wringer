@@ -3,6 +3,10 @@
     <string name="app_name">Sound Wringer</string>
     <string name="profilechooser_label">Choose Wringer Profile</string>
 
+    <string name="choose_title">Which tone type?</string>
+    <string name="choose_ringtone">Choose Ringtone</string>
+    <string name="choose_notifytone">Choose Notifytone</string>
+
 
     <string name="profile_prefs_cat">Profile Settings</string>
     <string name="name">Profile Name</string>

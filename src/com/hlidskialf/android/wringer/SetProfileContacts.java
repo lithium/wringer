@@ -1,5 +1,6 @@
 package com.hlidskialf.android.wringer;
 
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ContentUris;
 import android.content.Context;
@@ -25,13 +26,14 @@ import java.util.HashMap;
 public class SetProfileContacts extends ListActivity
 {
   private static final int REQUEST_RINGTONE=1;
+  private static final int REQUEST_NOTIFYTONE=2;
 
   private Cursor mPeopleCursor;
-  private long mPickingId;
+  private int mPickingId;
   private View mPickingView;
   private ProfileContactsAdapter mListAdapter;
   private int mProfileId;
-  private HashMap<Integer,Uri> mRingtones;
+  private HashMap<Integer,Uri[]> mRingtones;
 
   class ProfileContactsAdapter extends CursorAdapter 
   {
@@ -79,8 +81,18 @@ public class SetProfileContacts extends ListActivity
       }
 
       if (mRingtones.containsKey(id)) {
-        tv = (TextView)v.findViewById(android.R.id.text2);
-        tv.setText( Wringer.getRingtoneTitle(context, mRingtones.get(id)) ); 
+        Uri[] uris = mRingtones.get(id);
+        tv = (TextView)v.findViewById(R.id.ringtone_text);
+        if (uris[0] != null)
+          tv.setText( Wringer.getRingtoneTitle(context, uris[0]) ); 
+        else
+          tv.setText( R.string.ringtone );
+
+        tv = (TextView)v.findViewById(R.id.notifytone_text);
+        if (uris[1] != null)
+          tv.setText( Wringer.getRingtoneTitle(context, uris[1]) ); 
+        else
+          tv.setText( R.string.notifytone );
       }
 
     }
@@ -123,34 +135,75 @@ public class SetProfileContacts extends ListActivity
   @Override
   protected void onListItemClick(ListView lv, View v, int pos, long id)
   {
-    mPickingId = mListAdapter.getItemId(pos);
+    mPickingId = (int)mListAdapter.getItemId(pos);
     mPickingView = v;
-    Intent picker = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-    startActivityForResult(picker, REQUEST_RINGTONE);
+
+    
+    final Dialog d = new Dialog(this);
+    View layout = d.getLayoutInflater().inflate(R.layout.ringnotify_dialog, null);
+    d.setContentView(layout);
+    d.setTitle(R.string.choose_title);
+    Button b;
+    b = (Button)layout.findViewById(android.R.id.button1);
+    b.setOnClickListener(new Button.OnClickListener() {
+      public void onClick(View v) {
+        Intent picker = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        startActivityForResult(picker, REQUEST_RINGTONE);
+        d.dismiss();
+      }
+    });
+    b = (Button)layout.findViewById(android.R.id.button2);
+    b.setOnClickListener(new Button.OnClickListener() {
+      public void onClick(View v) {
+        Intent picker = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        startActivityForResult(picker, REQUEST_NOTIFYTONE);
+        d.dismiss();
+      }
+    });
+    d.show();
+
   }
 
   @Override
   protected void onActivityResult(int request, int result, Intent data)
   {
     if (result != RESULT_OK) return;
+    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+    ContentValues values = new ContentValues(3);
+
+    values.put(ProfileModel.ProfileContactColumns.PROFILE_ID, mProfileId);
+    values.put(ProfileModel.ProfileContactColumns.CONTACT_ID, mPickingId);
+
+    Uri[] uris = mRingtones.get(mPickingId);
+    if (uris == null)
+      uris = new Uri[] {null,null};
+
+    TextView tv = null;
     if (request == REQUEST_RINGTONE) {
-      Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-
-      ContentValues values = new ContentValues(3);
-      values.put(ProfileModel.ProfileContactColumns.PROFILE_ID, mProfileId);
-      values.put(ProfileModel.ProfileContactColumns.CONTACT_ID, (int)mPickingId);
       values.put(ProfileModel.ProfileContactColumns.RINGTONE, uri.toString());
-
-      getContentResolver().insert(ProfileModel.ProfileContactColumns.CONTENT_URI, values);
-      mRingtones.put((int)mPickingId, uri);
-
-      TextView tv = (TextView)mPickingView.findViewById(android.R.id.text2);
-      tv.setText( Wringer.getRingtoneTitle(this, uri) ); 
-
-      android.util.Log.v("picked", String.valueOf(mPickingId)+": "+uri.toString());
-      mPickingId = -1;
-      mPickingView = null;
+      tv = (TextView)mPickingView.findViewById(R.id.ringtone_text);
+      uris[0] = uri;
     }
+    else if (request == REQUEST_NOTIFYTONE) {
+      values.put(ProfileModel.ProfileContactColumns.NOTIFYTONE, uri.toString());
+      tv = (TextView)mPickingView.findViewById(R.id.notifytone_text);
+      uris[1] = uri;
+    }
+
+    int pcid = ProfileModel.getProfileContactId(getContentResolver(), mProfileId, mPickingId);
+    if (pcid == -1) {
+      getContentResolver().insert(ProfileModel.ProfileContactColumns.CONTENT_URI, values);
+    } else {
+      Uri update_uri = Uri.withAppendedPath(ProfileModel.ProfileContactColumns.CONTENT_URI, String.valueOf(pcid));
+      getContentResolver().update(update_uri, values, null, null);
+    }
+
+    mRingtones.put(mPickingId, uris);
+
+    if (tv != null)
+      tv.setText( Wringer.getRingtoneTitle(this, uri) ); 
+    mPickingId = -1;
+    mPickingView = null;
   }
 
 }

@@ -201,17 +201,17 @@ public class Wringer
       //autosync - secured
 
       //iterate over all contacts and update their ringtones
-      HashMap<Integer,Uri> ringtones = ProfileModel.getAllContactRingtones(mResolver, mProfileId);
+      HashMap<Integer,Uri[]> ringtones = ProfileModel.getAllContactRingtones(mResolver, mProfileId);
       Cursor people = mResolver.query(People.CONTENT_URI, 
         new String[] {People._ID}, 
         People.PRIMARY_PHONE_ID+" IS NOT NULL",null,null);
       if (people != null && people.moveToFirst()) {
         do {
           int contact_id = people.getInt(0);  
-          Uri contact_ringtone = ringtones.get(contact_id);
+          Uri[] uris = ringtones.get(contact_id);
           ContentValues values = new ContentValues(1);
           values.put(People.CUSTOM_RINGTONE, 
-            contact_ringtone == null ?  "" : contact_ringtone.toString());
+            uris[0] == null ?  "" : uris[0].toString());
           mResolver.update(
             Uri.withAppendedPath(People.CONTENT_URI, String.valueOf(contact_id)),
             values, null,null

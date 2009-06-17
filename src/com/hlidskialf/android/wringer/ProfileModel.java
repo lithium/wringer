@@ -146,20 +146,45 @@ public class ProfileModel
     cursor.close();
   }
 
-  public static HashMap<Integer,Uri> getAllContactRingtones(ContentResolver resolver, int profile_id)
+  public static HashMap<Integer,Uri[]> getAllContactRingtones(ContentResolver resolver, int profile_id)
   {
     Cursor cursor = resolver.query(ProfileContactColumns.CONTENT_URI, 
-      new String[] {ProfileContactColumns.CONTACT_ID, ProfileContactColumns.RINGTONE},
+      new String[] {
+        ProfileContactColumns.CONTACT_ID, 
+        ProfileContactColumns.RINGTONE,
+        ProfileContactColumns.NOTIFYTONE
+      },
       ProfileContactColumns.PROFILE_ID+"="+profile_id, null, null);
-    HashMap<Integer,Uri> ret = new HashMap<Integer,Uri>(cursor.getCount());
+    HashMap<Integer,Uri[]> ret = new HashMap<Integer,Uri[]>(cursor.getCount());
     if (cursor.moveToFirst()) {
       do {
         int contact_id = cursor.getInt(0);
         String ringtone = cursor.getString(1);
-        ret.put(contact_id, Uri.parse(ringtone));
+        String notifytone = cursor.getString(2);
+        Uri[] uris = new Uri[] {null,null};
+        if (ringtone != null)
+          uris[0] = Uri.parse(ringtone);
+        if (notifytone != null)
+          uris[1] = Uri.parse(notifytone);
+        ret.put(contact_id, uris);
       } while (cursor.moveToNext());
     }
     cursor.close();
+    return ret;
+  }
+
+  public static int getProfileContactId(ContentResolver resolver, int profile_id, int contact_id)
+  {
+    Cursor c = resolver.query(ProfileContactColumns.CONTENT_URI,
+      new String[] { ProfileContactColumns._ID },
+        ProfileModel.ProfileContactColumns.PROFILE_ID+"="+profile_id
+        +" AND "+
+        ProfileModel.ProfileContactColumns.CONTACT_ID+"="+contact_id, null,null);
+    int ret = -1;
+    if (c.moveToFirst()) {
+      ret = c.getInt(0);
+    }
+    c.close();
     return ret;
   }
 }
