@@ -303,7 +303,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mVolMusic = vol;
     mPrefVolMusic.setSummary(String.valueOf(vol) +" / "+ String.valueOf(mPrefVolMusic.getMax()));
     if (save)
-      update_column(ProfileModel.ProfileColumns.ALARM_VOLUME, mVolMusic);
+      update_column(ProfileModel.ProfileColumns.MUSIC_VOLUME, mVolMusic);
   }
   private void update_notify_vol(int vol, boolean save) {
     mVolNotify = vol;
@@ -395,7 +395,11 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mAirplaneOn = is_on;
     if (mAirplaneOn) {
       mPrefWifi.setEnabled(false);
+      mPrefWifi.setChecked(false);
       mPrefBluetooth.setEnabled(false);
+      mPrefBluetooth.setChecked(false);
+      update_wifi(false, true);
+      update_bluetooth(false, true);
     }
     else {
       mPrefWifi.setEnabled(true);
