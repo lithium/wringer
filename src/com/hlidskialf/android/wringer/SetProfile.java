@@ -393,6 +393,15 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
   private void update_airplane(boolean is_on, boolean save)
   {
     mAirplaneOn = is_on;
+    if (mAirplaneOn) {
+      mPrefWifi.setEnabled(false);
+      mPrefBluetooth.setEnabled(false);
+    }
+    else {
+      mPrefWifi.setEnabled(true);
+      mPrefBluetooth.setEnabled(true);
+    }
+
     if (save)
       update_column(ProfileModel.ProfileColumns.AIRPLANE_ON, mAirplaneOn);
   }
