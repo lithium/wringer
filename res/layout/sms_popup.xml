@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:padding="8dp"
+  >
+  <RelativeLayout android:id="@+id/sms_header"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <ImageView android:id="@android:id/icon"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentTop="true"
+      />
+    <TextView android:id="@android:id/text1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@android:id/icon"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      />
+    <TextView android:id="@android:id/text2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@android:id/icon"
+      android:layout_below="@android:id/text1"
+      android:layout_centerHorizontal="true"
+      android:textAppearance="?android:attr/textAppearanceMedium"
+      />
+  </RelativeLayout>
+
+  <LinearLayout android:id="@id/button_bar"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    >
+    <Button android:id="@android:id/button1"
+      android:layout_height="wrap_content"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:text="@android:string/ok"
+      />
+    <Button android:id="@android:id/button2"
+      android:layout_height="wrap_content"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:text="@android:string/untitled"
+      />
+    <Button android:id="@android:id/button3"
+      android:layout_height="wrap_content"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:text="@android:string/cancel"
+      />
+  </LinearLayout>
+    
+  <ScrollView 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_below="@id/sms_header"
+    android:layout_above="@id/button_bar"
+    >
+    <TextView android:id="@+id/sms_body"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      />
+  </ScrollView>
+
+</RelativeLayout>

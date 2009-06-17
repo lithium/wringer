@@ -3,36 +3,22 @@ package com.hlidskialf.android.wringer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.Contacts.Phones;
-import android.telephony.gsm.SmsMessage;
 
 public class SMSReceiver extends BroadcastReceiver {
+  public static final String EXTRA_SMS_EXTRAS="sms_extras";
+
   @Override
   public void onReceive(Context context, Intent intent) {
-    Bundle b = intent.getExtras();
-    Object[] messages = (Object[])b.get("pdus");
-    int i;
-    for (i=0; i < messages.length; i++) {
-      SmsMessage msg = SmsMessage.createFromPdu((byte[])messages[i]);
-      String from = msg.getDisplayOriginatingAddress();
-      android.util.Log.v("Wringer","FROM: "+from);
+  /*
+    Intent service_intent = new Intent(context, SMSService.class);
+    service_intent.putExtra(EXTRA_SMS_EXTRAS, intent.getExtras());
+    context.startService(service_intent);
+    */
 
-      String number_key = new StringBuffer(from).reverse().toString().replaceAll("/[^0-9]/","");
-
-      android.util.Log.v("Wringer","KEY: "+number_key);
-
-      Cursor cursor = context.getContentResolver().query(Phones.CONTENT_URI,
-        new String[]{Phones.PERSON_ID}, 
-        Phones.NUMBER_KEY+"=?",new String[]{number_key},null);
-      if (cursor.moveToFirst()) {
-        int contact_id = cursor.getInt(0); 
-        android.util.Log.v("Wringer", "CONTACT: "+contact_id);
-      }
-      cursor.close();
-    }
+    Intent popup_intent = new Intent(context, SMSPopup.class);
+    popup_intent.putExtra(SMSReceiver.EXTRA_SMS_EXTRAS, intent.getExtras());
+    popup_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    context.startActivity(popup_intent);
   }
 
 }

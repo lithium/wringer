@@ -37,12 +37,6 @@
         <provider android:name="com.hlidskialf.android.wringer.ProfileProvider"
           android:authorities="com.hlidskialf.android.wringer"/>
 
-        <receiver android:name=".SMSReceiver">
-          <intent-filter>
-            <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-          </intent-filter>
-        </receiver>
-
         <receiver android:name=".WringerWidgetProvider"
                   android:icon="@drawable/wringer_icon"
                   >
@@ -52,6 +46,20 @@
           <meta-data android:name="android.appwidget.provider"
                      android:resource="@xml/appwidget_info" />
         </receiver>
+
+
+        <receiver android:name=".SMSReceiver">
+          <intent-filter>
+            <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+          </intent-filter>
+        </receiver>
+
+        <activity android:name=".SMSPopup" 
+                  android:exported="false" 
+                  android:theme="@android:style/Theme.Dialog"
+                  android:label="@string/incoming_sms"
+                  />
+
 
     </application>
 </manifest> 
