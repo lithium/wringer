@@ -7,6 +7,7 @@
     <string name="choose_ringtone">Choose Ringtone</string>
     <string name="choose_notifytone">Choose Notifytone</string>
 
+    <string name="seconds"> Seconds</string>
 
     <string name="profile_prefs_cat">Profile Settings</string>
     <string name="name">Profile Name</string>

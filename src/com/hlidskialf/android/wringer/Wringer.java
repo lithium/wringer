@@ -210,8 +210,11 @@ public class Wringer
           int contact_id = people.getInt(0);  
           Uri[] uris = ringtones.get(contact_id);
           ContentValues values = new ContentValues(1);
-          values.put(People.CUSTOM_RINGTONE, 
-            uris[0] == null ?  "" : uris[0].toString());
+          String new_ringtone = "";
+          if (uris != null && uris[0] != null)
+            new_ringtone = uris[0].toString();
+
+          values.put(People.CUSTOM_RINGTONE, new_ringtone);
           mResolver.update(
             Uri.withAppendedPath(People.CONTENT_URI, String.valueOf(contact_id)),
             values, null,null
@@ -331,22 +334,23 @@ public class Wringer
         iv.setImageResource(R.drawable.stat_sys_signal_flightmode);
         bar.addView(iv);
       }
+      int bluetooth_on = cursor.getInt(mBluetoothIdx);
+      if (bluetooth_on != 0) {
+        iv = new ImageView(context);
+        iv.setImageResource(R.drawable.stat_sys_data_bluetooth);
+        bar.addView(iv);
+      }
       int wifi_on = cursor.getInt(mWifiIdx);
       if (wifi_on != 0) {
         iv = new ImageView(context);
         iv.setImageResource(R.drawable.stat_sys_wifi_signal_4);
         bar.addView(iv);
       }
+      /*
       int gps_on = cursor.getInt(mGpsIdx);
       if (gps_on != 0) {
         iv = new ImageView(context);
         iv.setImageResource(R.drawable.stat_sys_gps_on);
-        bar.addView(iv);
-      }
-      int bluetooth_on = cursor.getInt(mBluetoothIdx);
-      if (bluetooth_on != 0) {
-        iv = new ImageView(context);
-        iv.setImageResource(R.drawable.stat_sys_data_bluetooth);
         bar.addView(iv);
       }
       int autosync_on = cursor.getInt(mAutosyncIdx);
@@ -355,6 +359,7 @@ public class Wringer
         iv.setImageResource(R.drawable.stat_notify_sync);
         bar.addView(iv);
       }
+      */
     }
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {

@@ -29,7 +29,6 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
 
   public SeekBarPreference(Context context, AttributeSet attrs) { 
     super(context,attrs); 
-    setPersistent(true);
     mContext = context;
 
     mDialogMessage = attrs.getAttributeValue(androidns,"dialogMessage");
@@ -62,7 +61,8 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
     mSeekBar.setOnSeekBarChangeListener(this);
     layout.addView(mSeekBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-    mValue = getPersistedInt(mDefault);
+    if (shouldPersist())
+      mValue = getPersistedInt(mDefault);
 
     mSeekBar.setMax(mMax);
     mSeekBar.setProgress(mValue);
@@ -79,7 +79,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
   {
     super.onSetInitialValue(restore, defaultValue);
     if (restore) 
-      mValue = getPersistedInt(mDefault);
+      mValue = shouldPersist() ? getPersistedInt(mDefault) : 0;
     else 
       mValue = (Integer)defaultValue;
   }
@@ -97,5 +97,12 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
 
   public void setMax(int max) { mMax = max; }
   public int getMax() { return mMax; }
+
+  public void setProgress(int progress) { 
+    mValue = progress;
+    if (mSeekBar != null)
+      mSeekBar.setProgress(progress); 
+  }
+  public int getProgress() { return mValue; }
 }
 

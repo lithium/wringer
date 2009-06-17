@@ -16,12 +16,14 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.RingtonePreference;
 import com.hlidskialf.android.preference.SeekBarPreference;
+import android.view.WindowManager;
 
 public class SetProfile extends PreferenceActivity implements ProfileModel.ProfileReporter
 {
   private ContentResolver mResolver;
   private Uri mContentUri;
   private Intent mContactsIntent = null;
+  private float mCurBrightness;
 
   private int mId;
   private String mName;
@@ -68,10 +70,18 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mPrefBrightness = (SeekBarPreference)findPreference("brightness");
     mPrefBrightness.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
-        update_brightness((Integer)newValue, true);
+        int brightness = (Integer)newValue;
+        update_brightness(brightness, true);
+
+        //preview brightness
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.screenBrightness = Math.max(0.1f, (float)brightness / 255.0f);
+        getWindow().setAttributes(params);
+
         return true;
       }
     });
+    
     mPrefTimeout = (SeekBarPreference)findPreference("screen_timeout");
     mPrefTimeout.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -231,13 +241,13 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     mId = id;
     mContentUri = Uri.withAppendedPath(ProfileModel.ProfileColumns.CONTENT_URI, String.valueOf(mId));
     update_name(name, false);
-    update_alarm_vol(alarm_vol, false);
-    update_music_vol(music_vol, false);
-    update_notify_vol(notify_vol, false);
-    update_ringer_vol(ringer_vol, false);
-    update_system_vol(system_vol, false);
-    update_voice_vol(voice_vol, false);
-    update_ringer_mode(ringer_mode, false);
+    update_alarm_vol(alarm_vol, false); mPrefVolAlarm.setProgress(alarm_vol);
+    update_music_vol(music_vol, false); mPrefVolMusic.setProgress(music_vol);
+    update_notify_vol(notify_vol, false); mPrefVolNotify.setProgress(notify_vol);
+    update_ringer_vol(ringer_vol, false); mPrefVolRinger.setProgress(ringer_vol);
+    update_system_vol(system_vol, false); mPrefVolSystem.setProgress(system_vol);
+    update_voice_vol(voice_vol, false); mPrefVolVoice.setProgress(voice_vol);
+    update_ringer_mode(ringer_mode, false); mPrefRingerMode.setValue(ringer_mode);
     update_ringer_vibrate(ringer_vibrate, false); mPrefRingerVibrate.setChecked(ringer_vibrate);
     update_notify_vibrate(notify_vibrate, false); mPrefNotifyVibrate.setChecked(notify_vibrate);
     update_play_soundfx(play_soundfx, false); mPrefPlaySoundfx.setChecked(play_soundfx);
@@ -245,8 +255,8 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
     update_notifytone(notifytone, false);
     update_airplane(airplane_on, false); mPrefAirplane.setChecked(airplane_on);
     update_wifi(wifi_on, false); mPrefWifi.setChecked(wifi_on);
-    update_brightness(brightness, false);
-    update_timeout(screen_timeout, false);
+    update_brightness(brightness, false); mPrefBrightness.setProgress(brightness);
+    update_timeout(screen_timeout, false); mPrefTimeout.setProgress(screen_timeout);
     update_bluetooth(bluetooth_on, false); mPrefBluetooth.setChecked(bluetooth_on);
     /*
     update_gps(gps_on, false); mPrefGps.setChecked(gps_on);
@@ -378,7 +388,7 @@ public class SetProfile extends PreferenceActivity implements ProfileModel.Profi
   {
     mPlaySoundfx = is_on;
     if (save)
-      update_column(ProfileModel.ProfileColumns.NOTIFY_VIBRATE, mNotifyVibrate);
+      update_column(ProfileModel.ProfileColumns.PLAY_SOUNDFX, mNotifyVibrate);
   }
   private void update_airplane(boolean is_on, boolean save)
   {

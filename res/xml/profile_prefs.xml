@@ -8,16 +8,6 @@
       android:singleLine="true"
       android:selectAllOnFocus="true"
       />
-    <com.hlidskialf.android.preference.SeekBarPreference android:key="brightness"
-      android:title="@string/brightness"
-      android:max="255"
-      android:persistent="false"
-      />
-    <com.hlidskialf.android.preference.SeekBarPreference android:key="screen_timeout"
-      android:title="@string/screen_timeout"
-      android:max="600"
-      android:persistent="false"
-      />
       <!--
     <CheckBoxPreference android:key="autosync_on"
       android:title="@string/autosync_on"
@@ -105,6 +95,18 @@
   </PreferenceCategory>
 
   <PreferenceCategory android:title="@string/profile_prefs_cat_devices">
+    <com.hlidskialf.android.preference.SeekBarPreference android:key="brightness"
+      android:title="@string/brightness"
+      android:max="255"
+      android:persistent="false"
+      android:text=" / 255"
+      />
+    <com.hlidskialf.android.preference.SeekBarPreference android:key="screen_timeout"
+      android:title="@string/screen_timeout"
+      android:max="600"
+      android:persistent="false"
+      android:text=" seconds"
+      />
     <CheckBoxPreference android:key="airplane_on"
       android:title="@string/airplane_on"
       android:persistent="false"
