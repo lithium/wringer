@@ -52,8 +52,7 @@ public class SetProfileContacts extends ListActivity
       if (cursor.moveToFirst()) {
         do {
           int id = cursor.getInt(mIdIdx);
-          Uri uri = ContentUris.withAppendedId(People.CONTENT_URI, id);
-          Bitmap b = People.loadContactPhoto(context, uri, android.R.drawable.gallery_thumb, null);
+          Bitmap b = Wringer.getContactPhoto(context, id);
           if (b != null) {
             mPhotos.put(id, Bitmap.createScaledBitmap(b, 48, 48, true));
           }

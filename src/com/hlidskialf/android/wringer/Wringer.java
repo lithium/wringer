@@ -1,12 +1,18 @@
 package com.hlidskialf.android.wringer;
 
+
+
 import android.app.ProgressDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -16,25 +22,21 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Contacts.People;
 import android.provider.Settings;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CursorAdapter;
-import android.widget.ImageView;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.text.TextUtils;
-
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
-
 import java.lang.reflect.Method;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class Wringer
 {
@@ -65,6 +67,24 @@ public class Wringer
     Ringtone r = RingtoneManager.getRingtone(context, uri);
     return r.getTitle(context);
   }
+  public static Bitmap getContactPhoto(Context context, int contact_id)
+  {
+    Uri uri = ContentUris.withAppendedId(People.CONTENT_URI, contact_id);
+    return People.loadContactPhoto(context, uri, android.R.drawable.gallery_thumb, null);
+  }
+  public static String getContactName(Context context, int contact_id)
+  {
+    Uri uri = ContentUris.withAppendedId(People.CONTENT_URI, contact_id);
+    Cursor c = context.getContentResolver().query(uri,
+      new String[] {People.NAME}, null,null,null);
+    String ret = null;
+    if (c.moveToFirst()) {
+      ret = c.getString(0);
+    }
+    c.close();
+    return ret;
+  }
+
 
 
 
