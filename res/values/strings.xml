@@ -8,6 +8,8 @@
     <string name="choose_notifytone">Choose Notifytone</string>
 
     <string name="incoming_sms">Received SMS</string>
+    <string name="reply">Reply</string>
+    <string name="mark_read">Mark as Read</string>
 
     <string name="seconds"> Seconds</string>
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
+  android:id="@android:id/content"
+  android:layout_width="280dp"
+  android:layout_height="200dp"
+  android:background="@android:drawable/screen_background_light"
   android:padding="8dp"
   >
   <RelativeLayout android:id="@+id/sms_header"
@@ -21,7 +23,7 @@
       android:layout_toRightOf="@android:id/icon"
       android:layout_alignParentTop="true"
       android:layout_centerHorizontal="true"
-      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:textAppearance="?android:attr/textAppearanceLargeInverse"
       />
     <TextView android:id="@android:id/text2"
       android:layout_width="wrap_content"
@@ -29,7 +31,7 @@
       android:layout_toRightOf="@android:id/icon"
       android:layout_below="@android:id/text1"
       android:layout_centerHorizontal="true"
-      android:textAppearance="?android:attr/textAppearanceMedium"
+      android:textAppearance="?android:attr/textAppearanceMediumInverse"
       />
   </RelativeLayout>
 
@@ -49,14 +51,16 @@
       android:layout_height="wrap_content"
       android:layout_width="0dp"
       android:layout_weight="1"
-      android:text="@android:string/untitled"
+      android:text="@string/mark_read"
       />
+      <!--
     <Button android:id="@android:id/button3"
       android:layout_height="wrap_content"
       android:layout_width="0dp"
       android:layout_weight="1"
-      android:text="@android:string/cancel"
+      android:text="@string/reply"
       />
+      -->
   </LinearLayout>
     
   <ScrollView 
@@ -68,7 +72,7 @@
     <TextView android:id="@+id/sms_body"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:textAppearance="?android:attr/textAppearanceSmallInverse"
       />
   </ScrollView>
 

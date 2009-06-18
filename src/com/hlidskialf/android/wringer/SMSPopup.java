@@ -6,21 +6,54 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Contacts.Phones;
 import android.telephony.gsm.SmsMessage;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class SMSPopup extends Activity
 {
+
+  private class KillHandler extends Handler implements Runnable
+  {
+    public KillHandler(long delayMills) {
+      super();
+      postDelayed(this, delayMills);
+    }
+    public void run() { 
+      SMSPopup.this.finish();
+    }
+    public void die() {
+      removeCallbacks(this);
+    }
+  }
+  private KillHandler mKillHandler;
+
   @Override 
   public void onCreate(Bundle icicle)
   {
     super.onCreate(icicle);
+
+    Window win = getWindow();
+    WindowManager.LayoutParams params = win.getAttributes();
+    params.gravity = Gravity.BOTTOM;
+    win.setAttributes(params);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.sms_popup);
+
+    View layout = findViewById(android.R.id.content);
+    layout.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        start_messaging();
+      }
+    });
 
     Intent intent = getIntent();
     Bundle sms_extras = intent.getBundleExtra(SMSReceiver.EXTRA_SMS_EXTRAS);
@@ -59,5 +92,32 @@ public class SMSPopup extends Activity
 
 
     //}
+
+    mKillHandler = new KillHandler(15000);
+  }
+  @Override
+  public void onPause()
+  {
+    super.onPause();
+    if (!isFinishing())
+      finish();
+  }
+  @Override
+  public void onResume()
+  {
+    super.onResume();
+  }
+
+  private void start_messaging()
+  {
+    //Uri u = Uri.parse("content://mms-sms/threadID/"+mThreadId);
+    Intent i = new Intent(Intent.ACTION_MAIN);
+    i.setType("vnd.android-dir/mms-sms");
+    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    startActivity(i);
+    if (mKillHandler != null) {
+      mKillHandler.die();
+    }
+    finish();
   }
 }
