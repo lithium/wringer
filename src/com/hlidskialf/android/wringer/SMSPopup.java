@@ -104,9 +104,6 @@ public class SMSPopup extends Activity
       String body = msg.getDisplayMessageBody();
       long when = msg.getTimestampMillis();
 
-      android.util.Log.v("Wringer","FROM: "+from);
-      android.util.Log.v("Wringer","KEY: "+number_key);
-
       int contact_id = -1;
       Cursor cursor = getContentResolver().query(Phones.CONTENT_URI,
         new String[]{Phones.PERSON_ID}, 
@@ -123,15 +120,16 @@ public class SMSPopup extends Activity
       TextView txt_body = (TextView)findViewById(R.id.sms_body);
 
       if (contact_id == -1) { // no contact found
-        txt_name.setText(from);
+        txt_name.setText(android.R.string.unknownName);
       } else {
         Bitmap icon = Wringer.getContactPhoto(this, contact_id); 
-        txt_icon.setImageBitmap( Bitmap.createScaledBitmap(icon, 64,64, true) );
+        if (icon != null)
+          txt_icon.setImageBitmap( Bitmap.createScaledBitmap(icon, 64,64, true) );
         String name = Wringer.getContactName(this, contact_id);
         txt_name.setText(name);
-        txt_number.setText(from);
       }
-      txt_when.setText( DateUtils.formatSameDayTime(when, System.currentTimeMillis(), DateFormat.SHORT, DateFormat.LONG) );
+      txt_number.setText(from);
+      txt_when.setText( DateUtils.formatSameDayTime(when, System.currentTimeMillis(), DateFormat.SHORT, DateFormat.MEDIUM) );
       txt_body.setText(body);
 
 
