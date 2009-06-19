@@ -37,6 +37,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+import android.content.ComponentName;
+import android.app.ActivityManager;
 
 public class Wringer
 {
@@ -84,6 +86,56 @@ public class Wringer
     c.close();
     return ret;
   }
+
+  public static long getThreadIdFromAddress(Context context, String address) 
+  {
+    Uri uri = Uri.parse("content://mms-sms/threadID?recipient="+address);
+    Cursor c = context.getContentResolver().query(uri, 
+      new String[] {"_id"}, null, null, null);    
+    long ret = -1;
+    if (c.moveToFirst()) {
+      ret = c.getLong(0);
+    }
+    c.close();
+    return ret;
+  }
+  public static boolean setLastMessageRead(Context context, long thread_id)
+  {
+    ContentResolver resolver = context.getContentResolver();
+    long msg_id = -1;
+    Cursor c = resolver.query(Uri.parse("content://sms/conversations/"+thread_id), 
+      new String[] {"_id"}, null, null, "date desc");
+    if (c.moveToFirst()) {
+      msg_id = c.getLong(0);
+    }
+    c.close();
+    if (msg_id == -1) {
+      return false;
+    }
+
+    ContentValues values = new ContentValues(1);
+    values.put("read", String.valueOf(1));
+    try {
+      resolver.update(Uri.parse("content://sms/"+msg_id), values, null, null);
+    } catch (Exception e) {
+      android.util.Log.v("Wringer","failed to mark as read: "+e);
+      return false;
+    }
+    return true;
+  }
+  public static boolean is_app_active(Context context, ComponentName component)
+  {
+    ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+    Iterator<ActivityManager.RunningTaskInfo> it = am.getRunningTasks(1).iterator();
+    while (it.hasNext()) {
+      ActivityManager.RunningTaskInfo task_info = it.next();
+      ComponentName task_component = task_info.baseActivity;
+      if (component.equals(task_component))
+        return true;
+    }
+    return false;
+  }
+
 
 
 
