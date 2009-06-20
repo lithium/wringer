@@ -6,6 +6,15 @@ WringerActivity
     - Activate
   Apply profile after edit if active
 
+SMSPopup
+====
+  play ringtone
+  vibrate
+  wakeup
+  notification
+  multiple txts
+  timeout
+
 Chooser
 ====
   Long click to edit
@@ -19,18 +28,3 @@ Wringer
 ====
   Apply Progress dialog include name
 
-
-Preferences
-====
-  Widget Preferences
-    - show app icon
-    - show gps toggle
-    - show 3g toggle
-  SMS Preferences
-    - enable notifytone
-    - enable dialog
-    - duration autohide 
-    - enable vibrate
-    - led color
-    - enable wakeup
-    

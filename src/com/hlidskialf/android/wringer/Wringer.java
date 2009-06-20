@@ -46,8 +46,28 @@ public class Wringer
 
   public static final String EXTRA_PROFILE_ID="profile_id";
 
-  public static final String PREFERENCES="wringer";
+  public static final String PREFERENCES=PACKAGE_NAME+"_preferences";
   public static final String PREF_CUR_PROFILE="cur_profile";
+  public static final String PREF_WIDGET_SHOW_ICON_APP="widget_show_icon_app";
+  public static final boolean DEF_WIDGET_SHOW_ICON_APP=true;
+  public static final String PREF_WIDGET_SHOW_ICON_GPS="widget_show_icon_gps";
+  public static final boolean DEF_WIDGET_SHOW_ICON_GPS=true;
+  public static final String PREF_WIDGET_SHOW_ICON_3G="widget_show_icon_3g";
+  public static final boolean DEF_WIDGET_SHOW_ICON_3G=true;
+  public static final String PREF_SMS_POPUP="sms_popup";
+  public static final boolean DEF_SMS_POPUP=true;
+  public static final String PREF_SMS_POPUP_AUTOHIDE="sms_popup_autohide";
+  public static final int DEF_SMS_POPUP_AUTOHIDE=15;
+  public static final String PREF_SMS_POPUP_WAKEUP="sms_popup_wakeup";
+  public static final boolean DEF_SMS_POPUP_WAKEUP=true;
+  public static final String PREF_SMS_NOTIFICATION="sms_notification";
+  public static final boolean DEF_SMS_NOTIFICATION=true;
+  public static final String PREF_SMS_NOTIFICATION_TONE="sms_notification_tone";
+  public static final boolean DEF_SMS_NOTIFICATION_TONE=true;
+  public static final String PREF_SMS_NOTIFICATION_VIBRATE="sms_notification_vibrate";
+  public static final boolean DEF_SMS_NOTIFICATION_VIBRATE=false;
+  public static final String PREF_SMS_NOTIFICATION_COLOR="sms_notification_color";
+  public static final String DEF_SMS_NOTIFICATION_COLOR="magenta";
 
   public static String getCurProfileName(Context context)
   {
@@ -215,13 +235,7 @@ public class Wringer
       SharedPreferences prefs = mContext.getSharedPreferences(Wringer.PREFERENCES, 0);
       prefs.edit().putInt(Wringer.PREF_CUR_PROFILE, mProfileId).commit();
 
-      // update any widgets
-      AppWidgetManager awm = AppWidgetManager.getInstance(mContext);
-      int[] widget_ids = awm.getAppWidgetIds(new ComponentName(mContext, WringerWidgetProvider.class));
-      Intent intent = new Intent(mContext, WringerWidgetProvider.class);
-      intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-      intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widget_ids);
-      mContext.sendBroadcast(intent);
+      Wringer.updateWidgets(mContext);
 
       msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_DONE, mProfileId, 0);
       msg.sendToTarget();
@@ -446,5 +460,15 @@ public class Wringer
     public void setOnChooseProfileListener(OnChooseProfileListener listener) { 
       mListener = listener; 
     }
+  }
+
+  public static void updateWidgets(Context context)
+  {
+    AppWidgetManager awm = AppWidgetManager.getInstance(context);
+    int[] widget_ids = awm.getAppWidgetIds(new ComponentName(context, WringerWidgetProvider.class));
+    Intent intent = new Intent(context, WringerWidgetProvider.class);
+    intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widget_ids);
+    context.sendBroadcast(intent);
   }
 }

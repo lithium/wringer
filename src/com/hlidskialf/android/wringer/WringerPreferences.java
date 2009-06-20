@@ -11,4 +11,11 @@ public class WringerPreferences extends PreferenceActivity
     super.onCreate(icicle);
     addPreferencesFromResource(R.xml.preferences);
   }
+
+  @Override
+  protected void onStop()
+  {
+    super.onStop();
+    Wringer.updateWidgets(this);
+  }
 }

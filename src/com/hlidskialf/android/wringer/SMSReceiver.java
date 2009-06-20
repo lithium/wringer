@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ComponentName;
+import android.content.SharedPreferences;
 
 public class SMSReceiver extends BroadcastReceiver {
   public static final String EXTRA_SMS_EXTRAS="sms_extras";
@@ -16,17 +17,24 @@ public class SMSReceiver extends BroadcastReceiver {
     context.startService(service_intent);
     */
 
-    if (Wringer.is_app_active(context, new ComponentName("com.android.mms","com.android.mms.ui.ConversationList"))) {
-      // dont popup if messaging is active app 
-      
-    }
-    else {
+    SharedPreferences prefs = context.getSharedPreferences(Wringer.PREFERENCES, 0);
 
-      Intent popup_intent = new Intent(context, SMSPopup.class);
-      popup_intent.putExtra(SMSReceiver.EXTRA_SMS_EXTRAS, intent.getExtras());
-      popup_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      context.startActivity(popup_intent);
-    
+    //TODO: notification
+    if (prefs.getBoolean(Wringer.PREF_SMS_NOTIFICATION, Wringer.DEF_SMS_NOTIFICATION)) {
+    }
+
+
+    if (prefs.getBoolean(Wringer.PREF_SMS_POPUP, Wringer.DEF_SMS_POPUP)) {
+      //TODO: wakeup
+
+      ComponentName messaging = new ComponentName(
+        "com.android.mms","com.android.mms.ui.ConversationList");
+      if (!Wringer.is_app_active(context, messaging)) {
+        Intent popup_intent = new Intent(context, SMSPopup.class);
+        popup_intent.putExtra(SMSReceiver.EXTRA_SMS_EXTRAS, intent.getExtras());
+        popup_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(popup_intent);
+      }
     }
   }
 

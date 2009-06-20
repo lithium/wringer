@@ -3,6 +3,7 @@ package com.hlidskialf.android.wringer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -147,7 +148,10 @@ public class SMSPopup extends Activity
 
     //}
 
-    mKillHandler = new KillHandler(15000);
+    
+    SharedPreferences prefs = getSharedPreferences(Wringer.PREFERENCES, 0);
+    int timeout = prefs.getInt(Wringer.PREF_SMS_POPUP_AUTOHIDE, Wringer.DEF_SMS_POPUP_AUTOHIDE);
+    mKillHandler = new KillHandler(timeout*1000);
   }
 
   private void start_messaging()

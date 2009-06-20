@@ -10,4 +10,20 @@
     <item>vibrate</item>
     <item>silent</item>
   </string-array>
+  <string-array name="notification_colors">
+    <item>Red</item>
+    <item>Green</item>
+    <item>Blue</item>
+    <item>Orange</item>
+    <item>Magenta</item>
+    <item>Cyan</item>
+  </string-array>
+  <string-array name="notification_color_values">
+    <item>red</item>
+    <item>green</item>
+    <item>blue</item>
+    <item>orange</item>
+    <item>magenta</item>
+    <item>cyan</item>
+  </string-array>
 </resources>
