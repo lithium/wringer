@@ -69,6 +69,7 @@
                   android:label="@string/incoming_sms"
                   />
 
+        <activity android:name=".WringerPreferences" />
 
     </application>
 </manifest> 

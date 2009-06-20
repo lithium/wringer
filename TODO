@@ -1,25 +1,36 @@
-Splash
-===
-  ProfileChooser
-  ProfileList
-    Edit
-    Delete
-    New profile
-
-
-
-ProfileCreator
+WringerActivity
 ====
-  Name
-  Audio Levels
-  Ringtone
-  List of Contact Ringtones
+  Context Menu
+    - Edit
+    - Delete
+    - Activate
+  Apply profile after edit if active
+
+Chooser
+====
+  Long click to edit
+  cachecolorhint
+
+Provider
+====
+  default profiles
+
+Wringer
+====
+  Apply Progress dialog include name
 
 
-ProfileChooser
-===
-  Spinner of Profiles
-
-
-ContactPicker
-AppWidget
+Preferences
+====
+  Widget Preferences
+    - show app icon
+    - show gps toggle
+    - show 3g toggle
+  SMS Preferences
+    - enable notifytone
+    - enable dialog
+    - duration autohide 
+    - enable vibrate
+    - led color
+    - enable wakeup
+    

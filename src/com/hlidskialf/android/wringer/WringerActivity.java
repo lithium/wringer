@@ -1,6 +1,7 @@
 package com.hlidskialf.android.wringer;
 
 import android.app.ListActivity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
@@ -23,6 +26,7 @@ import android.widget.LinearLayout;
 public class WringerActivity extends ListActivity
 {
   public static final int REQUEST_SET_PROFILE=1;
+  public static final int REQUEST_PREFERENCES=2;
 
   private Wringer.ProfileAdapter mListAdapter;
   private ContentResolver mResolver;
@@ -71,10 +75,39 @@ public class WringerActivity extends ListActivity
   {
     if (request == REQUEST_SET_PROFILE) {
       if (mListAdapter.getCount() == 1) {
-        choose_profile(0);
+        //TODO
       }
     }
   }
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu)
+  {
+    super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.options, menu);
+
+    return true;
+  }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item)
+  {
+    switch (item.getItemId()) {
+      case R.id.options_menu_preferences:
+        startActivityForResult( 
+          new Intent(this, WringerPreferences.class), REQUEST_PREFERENCES);
+        return true;
+      case R.id.options_menu_about:
+        View layout = getLayoutInflater().inflate(R.layout.about, null);
+        AlertDialog dia = new AlertDialog.Builder(this)
+                                .setTitle(R.string.about_title)
+                                .setView(layout)
+                                .setPositiveButton(android.R.string.ok, null)
+                                .show();
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+
 
   private void edit_profile(int profile_id)
   {
@@ -83,7 +116,4 @@ public class WringerActivity extends ListActivity
     startActivityForResult(intent, REQUEST_SET_PROFILE);
   }
 
-  private void choose_profile(int pos)
-  {
-  }
 }

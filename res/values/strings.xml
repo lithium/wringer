@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Sound Wringer</string>
+
+    <string name="app_description">Sound Wringer - Ringtone Profiles</string>
+    <string name="app_version">v%s</string>
+    <string name="about_title">About Sound Wringer</string>
+    <string name="about_text">\n
+      <b>Original Source by</b>\n
+      <u>M. Wiggins</u>\n\n
+
+      <b>Published by</b>\n
+      <u>Hlidskialf Software</u>\n\n
+      No warranty of any kind provided.
+    </string>
+
     <string name="profilechooser_label">Choose Wringer Profile</string>
+
+    <string name="preferences">Preferences</string>
+    <string name="about">About</string>
 
     <string name="choose_title">Which tone type?</string>
     <string name="choose_ringtone">Choose Ringtone</string>
@@ -70,4 +86,42 @@
     <string name="ringer_mode_normal">Normal: Audible and may vibrate</string>
     <string name="ringer_mode_vibrate">Vibrate: Muted but vibrates</string>
     <string name="ringer_mode_silent">Silent: Muted and no vibration</string>
+
+
+    <string name="pref_widget_cat">Widget Preferences</string>
+    <string name="pref_widget_icon_app_title">Widget app icon</string>
+    <string name="pref_widget_icon_app_summary_on">App icon shown</string>
+    <string name="pref_widget_icon_app_summary_off">App icon not shown</string>
+    <string name="pref_widget_icon_gps_title">Widget GPS icon</string>
+    <string name="pref_widget_icon_gps_summary_on">GPS toggle button shown</string>
+    <string name="pref_widget_icon_gps_summary_off">GPS toggle button not shown</string>
+    <string name="pref_widget_icon_3g_title">Widget 3G icon</string>
+    <string name="pref_widget_icon_3g_summary_on">3G toggle button shown</string>
+    <string name="pref_widget_icon_3g_summary_off">3G toggle button not shown</string>
+
+    <string name="pref_sms_alert_cat">SMS Alert Preferences</string>
+    <string name="pref_sms_cat">SMS Popup Preferences</string>
+    <string name="pref_sms_notifytone_title">SMS ringtone</string>
+    <string name="pref_sms_notifytone_summary_on">Play ringtone on SMS</string>
+    <string name="pref_sms_notifytone_summary_off">Don't play ringtone on SMS</string>
+    <string name="pref_sms_vibrate_title">SMS vibrate</string>
+    <string name="pref_sms_vibrate_summary_on">Vibrate on SMS</string>
+    <string name="pref_sms_vibrate_summary_off">Don't vibrate on SMS</string>
+    <string name="pref_sms_popup_cat">SMS Popup Preferences</string>
+    <string name="pref_sms_popup_title">SMS popup dialog</string>
+    <string name="pref_sms_popup_summary_on">Show popup dialog on SMS</string>
+    <string name="pref_sms_popup_summary_off">Don't show popup dialog on SMS</string>
+    <string name="pref_sms_popup_autohide_title">SMS popup hide timeout</string>
+    <string name="pref_sms_popup_autohide_summary">Seconds to wait before hiding popup</string>
+    <string name="pref_sms_popup_wakeup_title">SMS wakeup</string>
+    <string name="pref_sms_popup_wakeup_summary_on">Wakeup phone on SMS</string>
+    <string name="pref_sms_popup_wakeup_summary_off">Don't wakeup phone on SMS</string>
+
+    <string name="pref_sms_notification_cat">SMS Notification Preferences</string>
+    <string name="pref_sms_notification_title">SMS notification</string>
+    <string name="pref_sms_notification_summary_on">Create a notification on SMS</string>
+    <string name="pref_sms_notification_summary_off">No notification on SMS</string>
+
+    <string name="pref_sms_notification_color_title">SMS notification LED color</string>
+    <string name="pref_sms_notification_color_summary">Color of the LED on SMS</string>
 </resources>

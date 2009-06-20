@@ -1,3 +1,4 @@
+<!-- 3x1 == 222x72  4x1 == 294x72 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
   android:minWidth="222dp"
   android:minHeight="72dp"

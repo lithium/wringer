@@ -1,8 +1,9 @@
 package com.hlidskialf.android.wringer;
 
-import android.appwidget.AppWidgetProvider;
-import android.appwidget.AppWidgetManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -25,6 +26,18 @@ public class WringerWidgetProvider extends AppWidgetProvider
       intent = new Intent(context, WringerActivity.class);
       pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
       views.setOnClickPendingIntent(android.R.id.icon, pendingIntent);
+
+      intent = new Intent("android.settings.LOCATION_SOURCE_SETTINGS");
+      intent.setComponent(new ComponentName(
+        "com.android.settings", "com.android.settings.SecuritySettings"));
+      pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+      views.setOnClickPendingIntent(R.id.icon_gps, pendingIntent);
+
+      intent = new Intent(Intent.ACTION_MAIN);
+      intent.setComponent(new ComponentName(
+        "com.android.phone", "com.android.phone.Settings"));
+      pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+      views.setOnClickPendingIntent(R.id.icon_3g, pendingIntent);
 
 
       String name = Wringer.getCurProfileName(context);

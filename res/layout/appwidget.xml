@@ -1,5 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:background="@drawable/widget_frame"
@@ -7,17 +6,40 @@
   <ImageView android:id="@android:id/icon"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
+    android:layout_centerVertical="true"
     android:layout_marginLeft="24dp"
+    android:layout_alignParentLeft="true"
     android:src="@drawable/wringer_icon"
     />
+
+  <LinearLayout android:id="@+id/button_bar"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="24dp"
+    >
+    <ImageView android:id="@+id/icon_gps"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/stat_sys_gps_on"
+      />
+    <ImageView android:id="@+id/icon_3g"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/stat_sys_data_connected_3g"
+      />
+  </LinearLayout>
 
   <Button android:id="@android:id/button1"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:layout_marginRight="24dp"
     android:gravity="center"
-    android:textAppearance="?android:attr/textAppearanceLarge"
+    android:ellipsize="marquee"
+    android:layout_toLeftOf="@id/button_bar"
+    android:layout_toRightOf="@android:id/icon"
+    android:layout_centerVertical="true"
+    android:textAppearance="?android:attr/textAppearanceMedium"
     />
-</LinearLayout>
+
+</RelativeLayout>
