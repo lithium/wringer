@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
+import android.view.ContextMenu;
 
 public class WringerActivity extends ListActivity
 {
@@ -31,6 +33,8 @@ public class WringerActivity extends ListActivity
   private Wringer.ProfileAdapter mListAdapter;
   private ContentResolver mResolver;
   private SharedPreferences mPrefs;
+  private int mEditingId = -1;
+
     
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -62,6 +66,8 @@ public class WringerActivity extends ListActivity
         edit_profile(profile_id);
       }
     });
+
+    registerForContextMenu(getListView());
   }
 
   @Override
@@ -74,10 +80,12 @@ public class WringerActivity extends ListActivity
   protected void onActivityResult(int request, int result, Intent data)
   {
     if (request == REQUEST_SET_PROFILE) {
-      if (mListAdapter.getCount() == 1) {
-        //TODO
+      int cur_profile = mPrefs.getInt(Wringer.PREF_CUR_PROFILE, -1);
+      if (mEditingId != -1 && mEditingId == cur_profile) {
+        Wringer.applyProfile(this, cur_profile, getWindow(), null);
       }
     }
+    mEditingId =-1;
   }
   @Override
   public boolean onCreateOptionsMenu(Menu menu)
@@ -107,10 +115,40 @@ public class WringerActivity extends ListActivity
     return super.onOptionsItemSelected(item);
   }
 
+  @Override
+  public  void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo info)
+  {
+    super.onCreateContextMenu(menu,v,info);
+    getMenuInflater().inflate(R.menu.context, menu);
+  }
+  @Override
+  public boolean onContextItemSelected(MenuItem item)
+  {
+    int pos = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
+    int profile_id = (int)mListAdapter.getItemId(pos);
+
+    switch (item.getItemId()) {
+      case R.id.context_menu_edit:
+        edit_profile(profile_id);
+        return true;
+      case R.id.context_menu_delete:
+        ProfileModel.deleteProfile(this, profile_id);
+        return true;
+      case R.id.context_menu_apply:
+        mListAdapter.setCurProfile(profile_id);
+        Wringer.applyProfile(this, profile_id, getWindow(), null);
+        getListView().invalidateViews();
+        return true;
+    }
+    return super.onContextItemSelected(item);
+  }
+
 
 
   private void edit_profile(int profile_id)
   {
+    mEditingId = profile_id;
+
     Intent intent = new Intent(this, SetProfile.class);
     intent.putExtra(Wringer.EXTRA_PROFILE_ID, profile_id);
     startActivityForResult(intent, REQUEST_SET_PROFILE);

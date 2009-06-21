@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Sound Wringer</string>
-
     <string name="app_description">Sound Wringer - Ringtone Profiles</string>
     <string name="app_version">v%s</string>
     <string name="about_title">About Sound Wringer</string>
@@ -18,6 +17,11 @@
 
     <string name="preferences">Preferences</string>
     <string name="about">About</string>
+
+    <string name="edit">Edit profile</string>
+    <string name="delete">Delete profile</string>
+    <string name="apply">Apply profile</string>
+
 
     <string name="choose_title">Which tone type?</string>
     <string name="choose_ringtone">Choose Ringtone</string>

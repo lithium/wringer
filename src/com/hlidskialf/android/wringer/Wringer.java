@@ -198,8 +198,10 @@ public class Wringer
           }
           break;
         case WHAT_START_PROGRESS:
-          if (mDialog == null)
-            mDialog = ProgressDialog.show(mContext, "Wringer", "Applying profile...", true, false);
+          if (mDialog == null) {
+            String name = (String)msg.obj;
+            mDialog = ProgressDialog.show(mContext, "Wringer", "Applying '"+name+"' profile...", true, false);
+          }
           break;
         case WHAT_DONE:
           if (mDialog != null)
@@ -217,6 +219,8 @@ public class Wringer
     private Handler mHandler;
     private int mProfileId;
     private ContentResolver mResolver;
+    private String mName;
+
     public ProfileApplier(Context context, int profile_id, Handler handler)
     {
       mContext = context;
@@ -226,8 +230,6 @@ public class Wringer
     }
 
     public void run() {
-      Message msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_START_PROGRESS);
-      msg.sendToTarget();
 
       ProfileModel.getProfile(mResolver, this, mProfileId);
 
@@ -237,7 +239,7 @@ public class Wringer
 
       Wringer.updateWidgets(mContext);
 
-      msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_DONE, mProfileId, 0);
+      Message msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_DONE, mProfileId, 0);
       msg.sendToTarget();
     }
 
@@ -248,6 +250,11 @@ public class Wringer
       boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on,
       boolean autosync_on, int brightness, int screen_timeout)
     {
+      Message msg;
+      msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_START_PROGRESS);
+      msg.obj = name;
+      msg.sendToTarget();
+
       AudioManager am = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
       am.setStreamVolume(AudioManager.STREAM_ALARM, alarm_vol, 0);
       am.setStreamVolume(AudioManager.STREAM_MUSIC, music_vol, 0);
@@ -273,7 +280,7 @@ public class Wringer
       Settings.System.putInt(mResolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
       
       //apply brightness immediately
-      Message msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_BRIGHTNESS, brightness, 0);
+      msg = mHandler.obtainMessage(ProfileApplierHandler.WHAT_BRIGHTNESS, brightness, 0);
       msg.sendToTarget();
   
       Settings.System.putInt(mResolver, Settings.System.AIRPLANE_MODE_ON, airplane_on ? 1 : 0);
@@ -307,6 +314,7 @@ public class Wringer
           );
         } while (people.moveToNext());
       }
+      people.close();
 
       //wifi
       WifiManager wm = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);

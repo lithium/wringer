@@ -95,6 +95,7 @@ public class ProfileModel
     );
   }
 
+
   public static int newProfile(Context context)
   {
     AudioManager audio_mgr = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
@@ -110,6 +111,11 @@ public class ProfileModel
     Uri new_uri = context.getContentResolver().insert(ProfileModel.ProfileColumns.CONTENT_URI, values);
     List<String> segments = new_uri.getPathSegments();
     return Integer.valueOf( segments.get(1) );
+  }
+  public static void deleteProfile(Context context, int profile_id)
+  {
+    context.getContentResolver().delete(ProfileColumns.CONTENT_URI, 
+      ProfileColumns._ID+"="+profile_id, null);
   }
 
   public static void getProfile(ContentResolver resolver, ProfileReporter reporter, int profile_id)
