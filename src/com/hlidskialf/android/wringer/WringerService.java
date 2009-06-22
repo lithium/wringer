@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.telephony.gsm.SmsMessage;
 import android.net.Uri;
 import android.os.IBinder;
+import android.provider.Settings.System;
 
 public class WringerService extends Service 
                             implements ProfileModel.ProfileReporter
@@ -44,13 +45,7 @@ public class WringerService extends Service
     boolean airplane_on, boolean wifi_on, boolean gps_on, boolean location_on, boolean bluetooth_on,
     boolean autosync_on, int brightness, int screen_timeout 
   ) {
-    do_notification(notifytone); 
 
-    stopSelfResult(mStartId);
-  }
-
-  private void do_notification(String notifytone)
-  {
     NotificationManager nmgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
     SmsMessage msg = mMessages[0];
 
@@ -70,7 +65,15 @@ public class WringerService extends Service
     n.flags = Notification.FLAG_AUTO_CANCEL | Notification.FLAG_ONLY_ALERT_ONCE;
 
     if (mPrefs.getBoolean(Wringer.PREF_SMS_NOTIFICATION_TONE, Wringer.DEF_SMS_NOTIFICATION_TONE)) {
-      n.sound = Uri.parse(notifytone);
+      String contact_notifytone = ProfileModel.getContactNotifytone(getContentResolver(), id, contact_id);
+      Uri tone = System.DEFAULT_NOTIFICATION_URI;
+
+      if (contact_notifytone != null) 
+        tone = Uri.parse(contact_notifytone);
+      else if (notifytone != null)
+        tone = Uri.parse(notifytone);
+
+      n.sound = tone;
     }
     if (mPrefs.getBoolean(Wringer.PREF_SMS_NOTIFICATION_VIBRATE, Wringer.DEF_SMS_NOTIFICATION_VIBRATE)) {
       n.flags |= Notification.DEFAULT_VIBRATE;
@@ -90,11 +93,19 @@ public class WringerService extends Service
     n.setLatestEventInfo(this, "New messages", unread_count+" unread messages.", pendingIntent);
 
     nmgr.notify(NOTIFICATION_ID, n);
+
+    stopSelfResult(mStartId);
   }
 
   @Override 
   public IBinder onBind(Intent intent) {
     return null;
+  }
+
+  public static void cancelAll()
+  {
+    NotificationManager nmgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    nmgr.cancelAll();
   }
 
 }

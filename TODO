@@ -1,10 +1,6 @@
 SMSPopup
 ====
-  notification
-    play ringtone
-    vibrate
   wakeup
-  multiple txts
 
 Provider
 ====

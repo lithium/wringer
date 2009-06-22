@@ -29,6 +29,7 @@ public class ProfileModel
     public static final int CONTACT_ID_INDEX = 2;
     public static final int RINGTONE_INDEX = 3;
     public static final int NOTIFYTONE_INDEX = 4;
+
   }
 
   public static class ProfileColumns implements BaseColumns {
@@ -189,6 +190,20 @@ public class ProfileModel
     int ret = -1;
     if (c.moveToFirst()) {
       ret = c.getInt(0);
+    }
+    c.close();
+    return ret;
+  }
+  public static String getContactNotifytone(ContentResolver resolver, int profile_id, int contact_id)
+  {
+    Cursor c = resolver.query(ProfileContactColumns.CONTENT_URI,
+      new String[] { ProfileContactColumns._ID, ProfileContactColumns.NOTIFYTONE },
+        ProfileModel.ProfileContactColumns.PROFILE_ID+"="+profile_id
+        +" AND "+
+        ProfileModel.ProfileContactColumns.CONTACT_ID+"="+contact_id, null,null);
+    String ret = null;
+    if (c.moveToFirst()) {
+      ret = c.getString(1);
     }
     c.close();
     return ret;
