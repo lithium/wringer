@@ -2,8 +2,10 @@ package com.hlidskialf.android.wringer;
 
 
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -18,11 +20,17 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Contacts.People;
+import android.provider.Contacts.Phones;
 import android.provider.Settings;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.gsm.SmsMessage;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +43,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.lang.reflect.Method;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
-import android.content.ComponentName;
-import android.app.ActivityManager;
 
 public class Wringer
 {
@@ -111,7 +118,7 @@ public class Wringer
   {
     Uri uri = Uri.parse("content://mms-sms/threadID?recipient="+address);
     Cursor c = context.getContentResolver().query(uri, 
-      new String[] {"_id"}, null, null, null);    
+        new String[] {"_id"}, null, null, null);    
     long ret = -1;
     if (c.moveToFirst()) {
       ret = c.getLong(0);
@@ -478,5 +485,76 @@ public class Wringer
     intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widget_ids);
     context.sendBroadcast(intent);
+  }
+
+  public static String formatTimestamp(long when)
+  {
+    return DateUtils.formatSameDayTime(when, System.currentTimeMillis(), DateFormat.SHORT, DateFormat.MEDIUM).toString();
+  }
+  public static String formatPhoneNumber(String from)
+  {
+    SpannableStringBuilder ssb = new SpannableStringBuilder(from);
+    PhoneNumberUtils.formatNanpNumber(ssb);
+    return ssb.toString();
+  }
+  public static int getContactIdFromAddress(Context context, String from_address)
+  {
+    int contact_id = -1;
+    String number_key = new StringBuffer(from_address).reverse().toString().replaceAll("/[^0-9]/","");
+    Cursor cursor = context.getContentResolver().query(Phones.CONTENT_URI,
+      new String[]{Phones.PERSON_ID}, 
+      Phones.NUMBER_KEY+"=?",new String[]{number_key},null);
+    if (cursor.moveToFirst()) {
+      contact_id = cursor.getInt(0); 
+    }
+    cursor.close();
+    return contact_id;
+  }
+  public static SmsMessage[] getSmsMessagesFromBundle(Bundle b) 
+  {
+    Object[] messages = (Object[])b.get("pdus");
+    int i;
+    SmsMessage[] ret = new SmsMessage[messages.length];
+    for (i=0; i < messages.length; i++) {
+      ret[i] = SmsMessage.createFromPdu((byte[])messages[i]);
+    }
+    return ret;
+  }
+  public static Intent getMessagingIntent(Context context, String from)
+  {
+    Intent ret = new Intent();
+    long thread_id = -1;
+    if (from != null)
+      thread_id = Wringer.getThreadIdFromAddress(context, from);
+    if (thread_id == -1) { // no thread found
+      ret.setAction(Intent.ACTION_MAIN);
+      ret.setType("vnd.android-dir/mms-sms");
+    }
+    else {
+      ret.setAction(Intent.ACTION_VIEW);
+      ret.setData( Uri.parse("content://mms-sms/threadID/"+thread_id) );
+    }
+    ret.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    return ret;
+  }
+
+  public static int getUnreadMessagesCount(Context context)
+  {
+    Cursor c = context.getContentResolver().query(Uri.parse("content://sms/inbox"),
+      new String[] { "_id" }, "read=0", null, null);
+    int ret =  c.getCount();
+    c.close();
+    return ret;
+  }
+
+  public static int getRgbFromColor(String color) 
+  {
+    if (color.equals("red")) return 0xffff0000;
+    if (color.equals("green")) return 0xff00ff00;
+    if (color.equals("blue")) return 0xff0000ff;
+    if (color.equals("orange")) return 0xffff7f00;
+    if (color.equals("magenta")) return 0xffec008c;
+    if (color.equals("cyan")) return 0xffec008c;
+    return 0xff00ff00;
   }
 }

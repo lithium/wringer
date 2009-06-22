@@ -21,10 +21,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 
-import android.telephony.PhoneNumberUtils;
-import java.text.DateFormat;
-import android.text.format.DateUtils;
-import android.text.SpannableStringBuilder;
 
 public class SMSPopup extends Activity
 {
@@ -103,28 +99,17 @@ public class SMSPopup extends Activity
 
     Intent intent = getIntent();
     Bundle sms_extras = intent.getBundleExtra(SMSReceiver.EXTRA_SMS_EXTRAS);
-    Object[] messages = (Object[])sms_extras.get("pdus");
-    int i=0;
-    android.util.Log.v("WringerSms", "messages.length: "+messages.length);
+    SmsMessage[] messages = Wringer.getSmsMessagesFromBundle(sms_extras);
+    //int i=0;
     //for (i=0; i < messages.length; i++) {
-      SmsMessage msg = SmsMessage.createFromPdu((byte[])messages[i]);
+      SmsMessage msg = messages[0];
       mFromAddress = msg.getDisplayOriginatingAddress();
-      String number_key = new StringBuffer(mFromAddress).reverse().toString().replaceAll("/[^0-9]/","");
-      SpannableStringBuilder f = new SpannableStringBuilder(mFromAddress);
-      PhoneNumberUtils.formatNanpNumber(f);
-      String from = f.toString();
-
       String body = msg.getDisplayMessageBody();
       mFromTimestamp = msg.getTimestampMillis();
 
-      int contact_id = -1;
-      Cursor cursor = getContentResolver().query(Phones.CONTENT_URI,
-        new String[]{Phones.PERSON_ID}, 
-        Phones.NUMBER_KEY+"=?",new String[]{number_key},null);
-      if (cursor.moveToFirst()) {
-        contact_id = cursor.getInt(0); 
-      }
-      cursor.close();
+      int contact_id = Wringer.getContactIdFromAddress(this, mFromAddress);
+      String from = Wringer.formatPhoneNumber(mFromAddress);
+      String when = Wringer.formatTimestamp(mFromTimestamp);
 
       ImageView txt_icon = (ImageView)findViewById(android.R.id.icon);
       TextView txt_name = (TextView)findViewById(android.R.id.text1);
@@ -142,7 +127,7 @@ public class SMSPopup extends Activity
         txt_name.setText(name);
       }
       txt_number.setText(from);
-      txt_when.setText( DateUtils.formatSameDayTime(mFromTimestamp, System.currentTimeMillis(), DateFormat.SHORT, DateFormat.MEDIUM) );
+      txt_when.setText(when);
       txt_body.setText(body);
 
 
@@ -156,17 +141,7 @@ public class SMSPopup extends Activity
 
   private void start_messaging()
   {
-    long thread_id = Wringer.getThreadIdFromAddress(this, mFromAddress);
-    Intent i = new Intent();
-    if (thread_id == -1) { // no thread found
-      i.setAction(Intent.ACTION_MAIN);
-      i.setType("vnd.android-dir/mms-sms");
-    }
-    else {
-      i.setAction(Intent.ACTION_VIEW);
-      i.setData( Uri.parse("content://mms-sms/threadID/"+thread_id) );
-    }
-    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    Intent i = Wringer.getMessagingIntent(this, mFromAddress);
     startActivity(i);
     finish();
   }
