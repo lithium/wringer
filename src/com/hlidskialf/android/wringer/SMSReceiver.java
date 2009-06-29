@@ -29,7 +29,7 @@ public class SMSReceiver extends BroadcastReceiver {
         //TODO: wakeup
         Intent popup_intent = new Intent(context, SMSPopup.class);
         popup_intent.putExtra(SMSReceiver.EXTRA_SMS_EXTRAS, intent.getExtras());
-        popup_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        popup_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(popup_intent);
       }
     }

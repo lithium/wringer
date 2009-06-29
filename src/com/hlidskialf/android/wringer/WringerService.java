@@ -102,9 +102,9 @@ public class WringerService extends Service
     return null;
   }
 
-  public static void cancelAll()
+  public static void cancelAll(Context context)
   {
-    NotificationManager nmgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationManager nmgr = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
     nmgr.cancelAll();
   }
 
